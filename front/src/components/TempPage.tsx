@@ -1,5 +1,5 @@
 // The exported code uses Tailwind CSS. Install Tailwind CSS in your dev environment to ensure all styles work.
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState } from "react";
 
 const TempPage: React.FC = () => {
   const [walletConnected, setWalletConnected] = useState<boolean>(false);
@@ -8,9 +8,12 @@ const TempPage: React.FC = () => {
   const [confirmingPayment, setConfirmingPayment] = useState<boolean>(false);
   const [paymentSuccess, setPaymentSuccess] = useState<boolean>(false);
   const [amount, setAmount] = useState<string>("0");
-  const [walletBalance, setWalletBalance] = useState<number>(1.234);
-  const [exchangeRate, setExchangeRate] = useState<number>(3500);
+  // const [walletBalance, setWalletBalance] = useState<number>(1.234);
+  // const [exchangeRate, setExchangeRate] = useState<number>(3500);
   const [merchantName, setMerchantName] = useState<string>("");
+
+  const walletBalance = 1.234;
+  const exchangeRate = 3500;
 
   const connectWallet = () => {
     setWalletConnected(true);
