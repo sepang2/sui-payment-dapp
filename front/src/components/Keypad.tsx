@@ -17,10 +17,10 @@ const Keypad: React.FC<KeypadProps> = ({ onKeyPress }) => {
         </button>
       ))}
       <button
-        onClick={() => onKeyPress("clear")}
+        onClick={() => onKeyPress(".")}
         className="bg-white border border-gray-200 rounded-button py-4 text-xl font-semibold cursor-pointer whitespace-nowrap"
       >
-        C
+        .
       </button>
       <button
         onClick={() => onKeyPress("0")}

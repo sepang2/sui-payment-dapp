@@ -74,6 +74,14 @@ const PaymetApp: React.FC = () => {
       setAmount((prev) => (prev.length > 1 ? prev.slice(0, -1) : "0"));
     } else if (key === "clear") {
       setAmount("0");
+    } else if (key === ".") {
+      setAmount((prev) => {
+        // 이미 소수점이 있으면 추가하지 않음
+        if (prev.includes(".")) return prev;
+        // "0"이면 "0."으로 시작
+        if (prev === "0") return "0.";
+        return prev + ".";
+      });
     } else {
       setAmount((prev) => {
         if (prev === "0") return key;

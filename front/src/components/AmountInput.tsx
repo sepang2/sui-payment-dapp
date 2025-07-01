@@ -27,7 +27,7 @@ const AmountInput: React.FC<AmountInputProps> = ({
           <p className="text-sm text-gray-500 mb-1">결제 금액</p>
           <p className="text-4xl font-bold text-indigo-600">{amount} SUI</p>
           <p className="text-sm text-gray-500 mt-1">
-            ≈ ${(parseFloat(amount) * 10).toFixed(2)} USD
+            ≈ ${(parseFloat(amount) * 3500).toFixed(2)} KRW
           </p>
         </div>
         <Keypad onKeyPress={onKeypadPress} />
