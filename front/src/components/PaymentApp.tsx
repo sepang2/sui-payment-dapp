@@ -41,15 +41,9 @@ const PaymetApp: React.FC = () => {
     startScanning();
   };
 
-  const handleQRScanSuccess = () => {
-    // 데모용 가맹점 데이터
-    const demoMerchantData = {
-      merchantAddress: "0x1234567890abcdef1234567890abcdef12345678",
-      merchantName: "커피숍 ABC",
-      maxAmount: 100,
-    };
-
-    handleScanResult(JSON.stringify(demoMerchantData));
+  const handleQRScanSuccess = (result: string) => {
+    // QR 스캔 결과를 처리
+    handleScanResult(result);
   };
 
   // QR 스캔 결과 처리
