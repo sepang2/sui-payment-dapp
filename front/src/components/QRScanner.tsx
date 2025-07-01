@@ -214,44 +214,38 @@ const QRScanner: React.FC<QRScannerProps> = ({ onCancel, onScanSuccess }) => {
   return (
     <div className="fixed inset-0 bg-black flex flex-col z-50">
       <div className="flex-1 relative overflow-hidden">
-        {/* 카메라 비디오 스트림 */}
-        <video
-          ref={videoRef}
-          className="absolute inset-0 w-full h-full object-cover z-10"
-          autoPlay
-          playsInline
-          muted
-          controls={false}
-          webkit-playsinline="true"
-          style={{
-            WebkitTransform: "translateZ(0)",
-            transform: "translateZ(0)",
-          }}
-        />
+        {/* 전체 어두운 배경 */}
+        <div className="absolute inset-0 bg-black z-10"></div>
 
-        {/* 반투명 오버레이 (QR 스캔 영역 외부를 어둡게) */}
-        <div className="absolute inset-0 z-20">
-          {/* 상단 오버레이 */}
-          <div className="absolute top-0 left-0 right-0 h-[calc(50%-8rem)] bg-black bg-opacity-50"></div>
-          {/* 하단 오버레이 */}
-          <div className="absolute bottom-0 left-0 right-0 h-[calc(50%-8rem)] bg-black bg-opacity-50"></div>
-          {/* 좌측 오버레이 */}
-          <div className="absolute top-[calc(50%-8rem)] bottom-[calc(50%-8rem)] left-0 w-[calc(50%-8rem)] bg-black bg-opacity-50"></div>
-          {/* 우측 오버레이 */}
-          <div className="absolute top-[calc(50%-8rem)] bottom-[calc(50%-8rem)] right-0 w-[calc(50%-8rem)] bg-black bg-opacity-50"></div>
-        </div>
-
-        {/* QR 코드 스캔 영역 가이드 */}
+        {/* QR 코드 스캔 영역 가이드 및 비디오 */}
         <div className="absolute inset-0 flex items-center justify-center z-30">
-          <div className="w-64 h-64 border-2 border-white rounded-lg relative bg-transparent">
-            {/* 모서리 가이드 */}
-            <div className="absolute -top-1 -left-1 w-8 h-8 border-t-4 border-l-4 border-indigo-400 rounded-tl-lg"></div>
-            <div className="absolute -top-1 -right-1 w-8 h-8 border-t-4 border-r-4 border-indigo-400 rounded-tr-lg"></div>
-            <div className="absolute -bottom-1 -left-1 w-8 h-8 border-b-4 border-l-4 border-indigo-400 rounded-bl-lg"></div>
-            <div className="absolute -bottom-1 -right-1 w-8 h-8 border-b-4 border-r-4 border-indigo-400 rounded-br-lg"></div>
+          <div className="w-64 h-64 relative">
+            {/* 카메라 비디오 스트림 - 프레임 내부에만 표시 */}
+            <video
+              ref={videoRef}
+              className="absolute inset-0 w-full h-full object-cover rounded-lg"
+              autoPlay
+              playsInline
+              muted
+              controls={false}
+              webkit-playsinline="true"
+              style={{
+                WebkitTransform: "translateZ(0)",
+                transform: "translateZ(0)",
+              }}
+            />
 
-            {/* 중앙 스캔 라인 애니메이션 */}
-            <div className="absolute inset-x-0 top-1/2 h-0.5 bg-indigo-400 opacity-80 animate-pulse"></div>
+            {/* 프레임 테두리 */}
+            <div className="absolute inset-0 border-2 border-white rounded-lg pointer-events-none z-10">
+              {/* 모서리 가이드 */}
+              <div className="absolute -top-1 -left-1 w-8 h-8 border-t-4 border-l-4 border-indigo-400 rounded-tl-lg"></div>
+              <div className="absolute -top-1 -right-1 w-8 h-8 border-t-4 border-r-4 border-indigo-400 rounded-tr-lg"></div>
+              <div className="absolute -bottom-1 -left-1 w-8 h-8 border-b-4 border-l-4 border-indigo-400 rounded-bl-lg"></div>
+              <div className="absolute -bottom-1 -right-1 w-8 h-8 border-b-4 border-r-4 border-indigo-400 rounded-br-lg"></div>
+
+              {/* 중앙 스캔 라인 애니메이션 */}
+              <div className="absolute inset-x-0 top-1/2 h-0.5 bg-indigo-400 opacity-80 animate-pulse"></div>
+            </div>
           </div>
         </div>
 
