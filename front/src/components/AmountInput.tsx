@@ -4,6 +4,7 @@ import Keypad from "./Keypad";
 interface AmountInputProps {
   amount: string;
   merchantName: string;
+  balance: number;
   onKeypadPress: (key: string) => void;
   onCancel: () => void;
   onProceed: () => void;
@@ -12,39 +13,63 @@ interface AmountInputProps {
 const AmountInput: React.FC<AmountInputProps> = ({
   amount,
   merchantName,
+  balance,
   onKeypadPress,
   onCancel,
   onProceed,
 }) => {
+  const displayAmount = parseFloat(amount) || 0;
+  const coinAmount = displayAmount.toLocaleString();
+  const availableCoin = balance.toLocaleString();
+
   return (
     <div className="fixed inset-0 bg-white flex flex-col">
-      <div className="p-6">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-bold text-gray-800">결제 금액 입력</h2>
-          <p className="text-sm text-gray-500">{merchantName}</p>
+      {/* 중앙 콘텐츠 */}
+      <div className="flex-1 flex flex-col items-center justify-center px-6">
+        {/* 카드 아이콘 */}
+        <div className="w-16 h-16 bg-indigo-600 rounded-xl flex items-center justify-center mb-8">
+          <i className="fas fa-credit-card text-white text-2xl"></i>
         </div>
-        <div className="bg-gray-50 p-6 rounded-lg mb-6">
-          <p className="text-sm text-gray-500 mb-1">결제 금액</p>
-          <p className="text-4xl font-bold text-indigo-600">{amount} SUI</p>
-          <p className="text-sm text-gray-500 mt-1">
-            ≈ ${(parseFloat(amount) * 3500).toFixed(2)} KRW
+
+        {/* 메시지 */}
+        <div className="text-center mb-8 p-4">
+          <h1 className="text-xl font-medium text-gray-800 mb-2">
+            {merchantName}에서
+          </h1>
+          <h2 className="text-xl font-medium text-gray-800">
+            얼마를 결제할까요?
+          </h2>
+        </div>
+
+        {/* 금액 표시 */}
+        <div className="text-center mb-4">
+          <p className="text-5xl font-bold text-gray-900 mb-2 pb-2">
+            {coinAmount} SUI
           </p>
+          <p className="text-gray-500">지갑 잔고 {availableCoin} SUI</p>
         </div>
+      </div>
+
+      {/* 하단 버튼 */}
+      <div className="px-6 pb-2 w-full flex flex-row gap-2">
+        <button
+          onClick={onCancel}
+          className="bg-gray-400 hover:bg-gray-500 text-white py-4 rounded-lg font-semibold text-lg transition-colors w-full"
+        >
+          취소
+        </button>
+        <button
+          onClick={onProceed}
+          disabled={displayAmount <= 0}
+          className="bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-300 text-white py-4 rounded-lg font-semibold text-lg transition-colors w-full"
+        >
+          다음
+        </button>
+      </div>
+
+      {/* 키패드 */}
+      <div className="px-6 pb-6">
         <Keypad onKeyPress={onKeypadPress} />
-        <div className="flex gap-3">
-          <button
-            onClick={onCancel}
-            className="flex-1 bg-gray-100 text-gray-700 py-3 rounded-button font-semibold cursor-pointer whitespace-nowrap"
-          >
-            취소
-          </button>
-          <button
-            onClick={onProceed}
-            className="flex-1 bg-indigo-600 text-white py-3 rounded-button font-semibold cursor-pointer whitespace-nowrap"
-          >
-            다음
-          </button>
-        </div>
       </div>
     </div>
   );

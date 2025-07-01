@@ -4,9 +4,14 @@ import QrScanner from "qr-scanner";
 interface QRScannerProps {
   onCancel: () => void;
   onScanSuccess: (result: string) => void;
+  onSkipToAmountInput: () => void;
 }
 
-const QRScanner: React.FC<QRScannerProps> = ({ onCancel, onScanSuccess }) => {
+const QRScanner: React.FC<QRScannerProps> = ({
+  onCancel,
+  onScanSuccess,
+  onSkipToAmountInput,
+}) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const qrScannerRef = useRef<QrScanner | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -270,8 +275,17 @@ const QRScanner: React.FC<QRScannerProps> = ({ onCancel, onScanSuccess }) => {
         </div>
       </div>
 
-      {/* 하단 취소 버튼 */}
-      <div className="p-6 bg-gradient-to-t from-black via-black/50 to-transparent z-30">
+      {/* 하단 버튼들 */}
+      <div className="p-6 bg-gradient-to-t from-black via-black/50 to-transparent z-50 space-y-3">
+        <button
+          onClick={() => {
+            stopCamera();
+            onSkipToAmountInput();
+          }}
+          className="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-button font-semibold cursor-pointer shadow-lg"
+        >
+          임시: 금액 입력하기
+        </button>
         <button
           onClick={handleCancel}
           className="w-full bg-white text-indigo-600 py-3 rounded-button font-semibold cursor-pointer shadow-lg"
