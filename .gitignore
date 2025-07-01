@@ -2,6 +2,7 @@
 Move.lock
 .env
 node_modules
+dist/
 scripts/flow/*/.flowconfig
 .flowconfig
 *~

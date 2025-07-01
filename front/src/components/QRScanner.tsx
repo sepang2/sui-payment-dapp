@@ -1,118 +1,47 @@
-import { useState } from "react";
-import {
-  Button,
-  Container,
-  Flex,
-  Text,
-  Card,
-  AlertDialog,
-} from "@radix-ui/themes";
-import { CameraIcon } from "@radix-ui/react-icons";
-import { useQRScanner } from "../hooks/useQRScanner";
+import React from "react";
 
 interface QRScannerProps {
-  onScanSuccess: (result: {
-    merchantAddress: string;
-    merchantName?: string;
-    maxAmount?: number;
-  }) => void;
+  onCancel: () => void;
+  onScanSuccess: () => void;
 }
 
-export function QRScanner({ onScanSuccess }: QRScannerProps) {
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const {
-    isScanning,
-    scanResult,
-    error,
-    startScanning,
-    stopScanning,
-    handleScanResult,
-    clearResult,
-  } = useQRScanner();
-
-  // 데모용 QR 코드 스캔 시뮬레이션
-  const simulateQRScan = () => {
-    // 데모용 가맹점 정보
-    const demoMerchantData = {
-      merchantAddress: "0x1234567890abcdef1234567890abcdef12345678",
-      merchantName: "데모 커피숍",
-      maxAmount: 100,
-    };
-
-    handleScanResult(JSON.stringify(demoMerchantData));
-  };
-
-  const handleStartScan = () => {
-    setIsDialogOpen(true);
-    startScanning();
-  };
-
-  const handleStopScan = () => {
-    setIsDialogOpen(false);
-    stopScanning();
-    clearResult();
-  };
-
-  // 스캔 성공 시 콜백 호출
-  if (scanResult && !error) {
-    onScanSuccess(scanResult);
-    clearResult();
-    setIsDialogOpen(false);
-  }
-
+const QRScanner: React.FC<QRScannerProps> = ({ onCancel, onScanSuccess }) => {
   return (
-    <Container my="2">
-      <Card>
-        <Flex direction="column" gap="3" p="4">
-          <Text size="4" weight="medium">
-            QR 코드 스캔
-          </Text>
-          <Text size="2" color="gray">
-            가맹점의 QR 코드를 스캔하여 결제를 시작하세요
-          </Text>
-
-          <Button size="3" onClick={handleStartScan} style={{ width: "100%" }}>
-            <CameraIcon />
-            QR 코드 스캔하기
-          </Button>
-
-          {/* QR 스캔 다이얼로그 */}
-          <AlertDialog.Root open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <AlertDialog.Content style={{ maxWidth: 450 }}>
-              <AlertDialog.Title>QR 코드 스캔</AlertDialog.Title>
-              <AlertDialog.Description size="2">
-                {isScanning ? (
-                  <Flex direction="column" gap="3" align="center" py="4">
-                    <Text>카메라로 QR 코드를 스캔하고 있습니다...</Text>
-                    <Text size="1" color="gray">
-                      (데모 버전: 아래 버튼으로 스캔을 시뮬레이션할 수 있습니다)
-                    </Text>
-                    <Button onClick={simulateQRScan} variant="soft">
-                      데모 QR 코드 스캔
-                    </Button>
-                  </Flex>
-                ) : (
-                  <Text>QR 코드 스캔을 준비 중입니다...</Text>
-                )}
-
-                {error && (
-                  <Text color="red" size="2">
-                    오류: {error}
-                  </Text>
-                )}
-              </AlertDialog.Description>
-
-              <Flex gap="3" mt="4" justify="end">
-                <AlertDialog.Cancel>
-                  <Button variant="soft" color="gray" onClick={handleStopScan}>
-                    취소
-                  </Button>
-                </AlertDialog.Cancel>
-              </Flex>
-            </AlertDialog.Content>
-          </AlertDialog.Root>
-        </Flex>
-      </Card>
-    </Container>
+    <div className="fixed inset-0 bg-black flex flex-col">
+      <div className="flex-1 relative">
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="w-64 h-64 border-2 border-white rounded-lg relative">
+            <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-indigo-500"></div>
+            <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-indigo-500"></div>
+            <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-indigo-500"></div>
+            <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-indigo-500"></div>
+          </div>
+        </div>
+        <div className="absolute top-0 inset-x-0 p-6">
+          <h2 className="text-white text-center text-xl font-bold">
+            QR 코드를 스캔해주세요
+          </h2>
+        </div>
+        {/* 데모 목적으로 QR 코드 인식 성공 버튼 추가 */}
+        <div className="absolute inset-x-0 bottom-32 flex justify-center">
+          <button
+            onClick={onScanSuccess}
+            className="bg-indigo-600 text-white py-2 px-4 rounded-button cursor-pointer whitespace-nowrap"
+          >
+            QR 인식 성공 (데모)
+          </button>
+        </div>
+      </div>
+      <div className="p-6">
+        <button
+          onClick={onCancel}
+          className="w-full bg-white text-indigo-600 py-3 rounded-button font-semibold cursor-pointer whitespace-nowrap"
+        >
+          취소
+        </button>
+      </div>
+    </div>
   );
-}
+};
+
+export default QRScanner;

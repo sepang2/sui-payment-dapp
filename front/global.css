@@ -4,3 +4,28 @@
 .rounded-button {
   border-radius: 8px;
 }
+
+/* ConnectButton 스타일 커스터마이징 */
+.connect-wallet-container button,
+.connect-wallet-main button {
+  background-color: #4f46e5 !important;
+  color: white !important;
+  border: none !important;
+  padding: 8px 16px !important;
+  border-radius: 8px !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: background-color 0.2s !important;
+}
+
+.connect-wallet-main button {
+  padding: 12px 24px !important;
+  font-size: 18px !important;
+  font-weight: 600 !important;
+}
+
+.connect-wallet-container button:hover,
+.connect-wallet-main button:hover {
+  background-color: #4338ca !important;
+}
