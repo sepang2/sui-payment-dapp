@@ -1,1 +1,6 @@
 @import "tailwindcss";
+
+/* Temp page specific styles */
+.rounded-button {
+  border-radius: 8px;
+}
