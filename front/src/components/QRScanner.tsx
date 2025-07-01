@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import QrScanner from "qr-scanner";
 
 interface QRScannerProps {
@@ -9,65 +9,179 @@ interface QRScannerProps {
 const QRScanner: React.FC<QRScannerProps> = ({ onCancel, onScanSuccess }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const qrScannerRef = useRef<QrScanner | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const mountedRef = useRef<boolean>(true);
+
   const [hasCamera, setHasCamera] = useState<boolean>(true);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
 
-  useEffect(() => {
-    const initializeQrScanner = async () => {
-      if (!videoRef.current) return;
+  // 카메라 권한 확인 함수
+  const checkCameraPermission = async () => {
+    try {
+      const permissionStatus = await navigator.permissions.query({
+        name: "camera" as PermissionName,
+      });
+      return permissionStatus.state; // 'granted', 'denied', or 'prompt'
+    } catch (err) {
+      console.error("Error checking camera permission: ", err);
+      return "prompt"; // 권한을 확인할 수 없으면 기본적으로 권한 요청을 진행
+    }
+  };
 
-      try {
-        // 카메라 사용 가능 여부 확인
-        const hasCamera = await QrScanner.hasCamera();
-        if (!hasCamera) {
-          setHasCamera(false);
-          setError("카메라를 사용할 수 없습니다.");
-          setIsLoading(false);
-          return;
-        }
-
-        // QR 스캐너 인스턴스 생성
-        const qrScanner = new QrScanner(
-          videoRef.current,
-          (result) => {
-            console.log("QR Code detected:", result.data);
-            onScanSuccess(result.data);
-          },
-          {
-            highlightScanRegion: true,
-            highlightCodeOutline: true,
-            preferredCamera: "environment", // 후면 카메라 사용 (모바일)
-          },
-        );
-
-        qrScannerRef.current = qrScanner;
-        await qrScanner.start();
-        setIsLoading(false);
-      } catch (err) {
-        console.error("QR Scanner initialization error:", err);
-        setError("카메라 접근 권한이 필요합니다.");
-        setIsLoading(false);
+  // QR 스캔 성공 핸들러
+  const handleScanSuccess = useCallback(
+    (result: any) => {
+      if (mountedRef.current) {
+        console.log("QR Code detected:", result.data);
+        onScanSuccess(result.data);
       }
-    };
+    },
+    [onScanSuccess],
+  );
 
-    initializeQrScanner();
+  // 카메라를 활성화하고 QR 스캐너 시작
+  const activateCamera = async () => {
+    if (!mountedRef.current || !videoRef.current) return;
 
-    // 컴포넌트 언마운트 시 정리
-    return () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+          facingMode: { ideal: "environment" }, // 후면 카메라
+        },
+        audio: false,
+      });
+
+      if (!mountedRef.current || !videoRef.current) {
+        // 컴포넌트가 언마운트된 경우 스트림 정리
+        stream.getTracks().forEach((track) => track.stop());
+        return;
+      }
+
+      streamRef.current = stream;
+      videoRef.current.srcObject = stream;
+      await videoRef.current.play();
+
+      // QR Scanner 초기화
       if (qrScannerRef.current) {
         qrScannerRef.current.stop();
         qrScannerRef.current.destroy();
       }
-    };
-  }, [onScanSuccess]);
 
-  const handleCancel = () => {
-    if (qrScannerRef.current) {
-      qrScannerRef.current.stop();
+      qrScannerRef.current = new QrScanner(
+        videoRef.current,
+        handleScanSuccess,
+        {
+          onDecodeError: (error) => {
+            // "No QR code found" 에러는 무시 (정상적인 상황)
+            if (error !== "No QR code found" && mountedRef.current) {
+              console.error("QR Scanner decode error: ", error);
+            }
+          },
+          returnDetailedScanResult: true,
+          highlightScanRegion: false, // 커스텀 UI 사용
+          highlightCodeOutline: false,
+          maxScansPerSecond: 5,
+        },
+      );
+
+      await qrScannerRef.current.start();
+
+      if (mountedRef.current) {
+        setIsLoading(false);
+      }
+    } catch (err: any) {
+      console.error("Error accessing camera: ", err);
+      if (mountedRef.current) {
+        if (err.name === "OverconstrainedError") {
+          setError("카메라 설정을 지원하지 않습니다.");
+        } else if (err.name === "NotAllowedError") {
+          setError(
+            "카메라 접근이 거부되었습니다. 카메라 접근을 허용하고 다시 시도해주세요.",
+          );
+        } else if (err.name === "NotFoundError") {
+          setError("카메라를 찾을 수 없습니다.");
+        } else {
+          setError("카메라 접근 중 오류가 발생했습니다.");
+        }
+        setHasCamera(false);
+        setIsLoading(false);
+      }
     }
-    onCancel();
   };
+
+  // 카메라 시작 함수
+  const startCamera = async () => {
+    if (!mountedRef.current) return;
+
+    try {
+      // 기본 카메라 접근 시도
+      const permissionState = await checkCameraPermission();
+
+      if (permissionState === "granted") {
+        await activateCamera();
+      } else if (permissionState === "prompt") {
+        await activateCamera(); // getUserMedia 호출 시 자동으로 권한 요청
+      } else {
+        if (mountedRef.current) {
+          setError(
+            "카메라 접근이 차단되었습니다. 설정에서 카메라 권한을 허용해주세요.",
+          );
+          setHasCamera(false);
+          setIsLoading(false);
+        }
+      }
+    } catch (err) {
+      console.error("Error starting camera: ", err);
+      if (mountedRef.current) {
+        setError("카메라를 시작할 수 없습니다.");
+        setHasCamera(false);
+        setIsLoading(false);
+      }
+    }
+  };
+
+  // 카메라 및 스캐너 정지
+  const stopCamera = useCallback(() => {
+    // QR Scanner 정지
+    if (qrScannerRef.current) {
+      try {
+        qrScannerRef.current.stop();
+        qrScannerRef.current.destroy();
+      } catch (e) {
+        console.warn("Error stopping QR scanner:", e);
+      }
+      qrScannerRef.current = null;
+    }
+
+    // 비디오 스트림 정지
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((track) => track.stop());
+      streamRef.current = null;
+    }
+
+    // 비디오 요소 정리
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
+  }, []);
+
+  useEffect(() => {
+    startCamera();
+
+    // 컴포넌트 언마운트 시 정리
+    return () => {
+      mountedRef.current = false;
+      stopCamera();
+    };
+  }, [stopCamera]);
+
+  const handleCancel = useCallback(() => {
+    stopCamera();
+    onCancel();
+  }, [stopCamera, onCancel]);
 
   if (!hasCamera || error) {
     return (
