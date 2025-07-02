@@ -171,6 +171,7 @@ const PaymetApp: React.FC = () => {
           <PaymentConfirmation
             amount={amount}
             merchantName={merchantName}
+            merchantAddress={merchantAddress}
             balance={displayBalance}
             walletAddress={account?.address}
             isProcessing={isProcessing}

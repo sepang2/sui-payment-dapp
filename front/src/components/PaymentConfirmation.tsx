@@ -3,6 +3,7 @@ import React from "react";
 interface PaymentConfirmationProps {
   amount: string;
   merchantName: string;
+  merchantAddress: string;
   balance: number;
   walletAddress?: string;
   isProcessing: boolean;
@@ -13,6 +14,7 @@ interface PaymentConfirmationProps {
 const PaymentConfirmation: React.FC<PaymentConfirmationProps> = ({
   amount,
   merchantName,
+  merchantAddress,
   balance,
   walletAddress,
   isProcessing,
@@ -82,10 +84,18 @@ const PaymentConfirmation: React.FC<PaymentConfirmationProps> = ({
               <p className="text-gray-900">{balance.toLocaleString()} SUI</p>
             </div>
             <div className="flex justify-between py-2">
-              <p className="text-gray-700">출금 지갑</p>
+              <p className="text-gray-700">결제 지갑</p>
               <p className="text-gray-900">
                 {walletAddress
                   ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`
+                  : "N/A"}
+              </p>
+            </div>
+            <div className="flex justify-between py-2">
+              <p className="text-gray-700">받는 지갑</p>
+              <p className="text-gray-900">
+                {merchantAddress
+                  ? `${merchantAddress.slice(0, 6)}...${merchantAddress.slice(-4)}`
                   : "N/A"}
               </p>
             </div>
