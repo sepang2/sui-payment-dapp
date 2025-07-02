@@ -36,6 +36,37 @@ const PaymetApp: React.FC = () => {
   const walletConnected = !!account;
   const walletBalance = balance;
 
+  // 지갑 연결 시 카메라 권한 요청
+  useEffect(() => {
+    const requestCameraPermission = async () => {
+      if (walletConnected) {
+        try {
+          // 카메라 권한 요청
+          const stream = await navigator.mediaDevices.getUserMedia({
+            video: {
+              width: { ideal: 1280 },
+              height: { ideal: 720 },
+              facingMode: { ideal: "environment" },
+            },
+            audio: false,
+          });
+
+          // 권한 확인을 위한 스트림이므로 즉시 종료
+          stream.getTracks().forEach((track) => track.stop());
+
+          // 권한이 허용되면 localStorage에 저장
+          localStorage.setItem("cameraPermission", "granted");
+          console.log("카메라 권한이 허용되었습니다.");
+        } catch (error) {
+          console.error("카메라 권한 요청 실패:", error);
+          localStorage.setItem("cameraPermission", "denied");
+        }
+      }
+    };
+
+    requestCameraPermission();
+  }, [walletConnected]);
+
   const startQRScan = () => {
     setScanningQR(true);
     startScanning();
