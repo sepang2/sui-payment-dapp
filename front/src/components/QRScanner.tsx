@@ -14,14 +14,132 @@ const QRScanner: React.FC<QRScannerProps> = ({
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const qrScannerRef = useRef<QrScanner | null>(null);
-  const streamRef = useRef<MediaStream | null>(null);
-  const mountedRef = useRef<boolean>(true);
+  // const streamRef = useRef<MediaStream | null>(null);
+  // const mountedRef = useRef<boolean>(true);
 
-  const [hasCamera, setHasCamera] = useState<boolean>(true);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  // const [hasCamera, setHasCamera] = useState<boolean>(true);
+  // const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isScanning, setIsScanning] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
 
-  // QR 스캔 성공 핸들러
+  // 카메라 권한 확인 함수
+  const checkCameraPermission = async () => {
+    try {
+      const permissionStatus = await navigator.permissions.query({
+        name: "camera" as PermissionName,
+      });
+      return permissionStatus.state;
+    } catch (err) {
+      console.error("Error checking camera permission: ", err);
+      return "prompt";
+    }
+  };
+
+  const activateCamera = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+          facingMode: { ideal: "environment" },
+        },
+        audio: false,
+      });
+
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        videoRef.current.play();
+
+        qrScannerRef.current = new QrScanner(
+          videoRef.current,
+          (result) => onScanSuccess(result.data),
+          {
+            onDecodeError: (error) => {
+              if (error !== "No QR code found") {
+                console.error("QR Scanner error: ", error);
+              }
+            },
+            returnDetailedScanResult: true,
+          },
+        );
+        qrScannerRef.current.start();
+        setIsScanning(true);
+      }
+    } catch (err) {
+      if (err === "OverconstrainedError") {
+        console.error("OverconstrainedError: 카메라 설정을 지원하지 않습니다.");
+      } else {
+        console.error("Error accessing camera: ", err);
+      }
+      setError(
+        "카메라 접근이 거부되었습니다. 카메라 접근을 허용하고 다시 시도해주세요.",
+      );
+    }
+  };
+
+  const startCamera = async () => {
+    const cameraPermission = localStorage.getItem("cameraPermission");
+
+    if (cameraPermission === "granted") {
+      await activateCamera();
+      return;
+    }
+
+    const permissionState = await checkCameraPermission();
+
+    if (permissionState === "granted") {
+      localStorage.setItem("cameraPermission", "granted");
+      await activateCamera();
+    } else if (permissionState === "prompt") {
+      try {
+        await navigator.mediaDevices.getUserMedia({
+          video: {
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
+            facingMode: { ideal: "environment" },
+          },
+          audio: false,
+        });
+        localStorage.setItem("cameraPermission", "granted");
+        await activateCamera();
+      } catch (err) {
+        console.error("Error accessing camera after permission prompt: ", err);
+        setError("카메라 접근이 거부되었습니다. 다시 시도해주세요.");
+      }
+    } else {
+      setError(
+        "카메라 접근이 차단되었습니다. 설정에서 카메라 권한을 허용해주세요.",
+      );
+    }
+  };
+
+  const stopCamera = () => {
+    if (videoRef.current && videoRef.current.srcObject) {
+      const stream = videoRef.current.srcObject as MediaStream;
+      const tracks = stream.getTracks();
+      tracks.forEach((track) => track.stop());
+      videoRef.current.srcObject = null;
+      qrScannerRef.current?.stop();
+      setIsScanning(false);
+    }
+  };
+
+  const handleCancel = useCallback(() => {
+    stopCamera();
+    onCancel();
+  }, [stopCamera, onCancel]);
+
+  useEffect(() => {
+    const startCam = async () => {
+      await startCamera();
+    };
+    startCam();
+
+    return () => stopCamera();
+  }, []);
+
+  /*
+// QR 스캔 성공 핸들러
   const handleScanSuccess = useCallback(
     (result: any) => {
       if (mountedRef.current) {
@@ -202,19 +320,20 @@ const QRScanner: React.FC<QRScannerProps> = ({
   if (!hasCamera || error) {
     return (
       <div className="fixed inset-0 bg-black flex flex-col items-center justify-center z-50">
-        <div className="text-white text-center p-6">
-          <h2 className="text-xl font-bold mb-4">카메라 오류</h2>
-          <p className="mb-6">{error || "카메라를 사용할 수 없습니다."}</p>
-          <button
-            onClick={onCancel}
-            className="bg-indigo-600 text-white py-3 px-6 rounded-button font-semibold cursor-pointer"
-          >
-            돌아가기
-          </button>
-        </div>
+      <div className="text-white text-center p-6">
+      <h2 className="text-xl font-bold mb-4">카메라 오류</h2>
+      <p className="mb-6">{error || "카메라를 사용할 수 없습니다."}</p>
+      <button
+      onClick={onCancel}
+      className="bg-indigo-600 text-white py-3 px-6 rounded-button font-semibold cursor-pointer"
+      >
+      돌아가기
+      </button>
+      </div>
       </div>
     );
   }
+  */
 
   return (
     <div className="fixed inset-0 bg-black flex flex-col z-50">
@@ -223,7 +342,7 @@ const QRScanner: React.FC<QRScannerProps> = ({
         <div className="absolute inset-0 bg-black z-10"></div>
 
         {/* QR 코드 스캔 영역 가이드 및 비디오 */}
-        <div className="absolute inset-0 flex items-center justify-center z-30">
+        <div className="absolute inset-0 flex flex-col items-center justify-center z-30 gap-4">
           <div className="w-64 h-64 relative">
             {/* 카메라 비디오 스트림 - 프레임 내부에만 표시 */}
             <video
@@ -252,17 +371,33 @@ const QRScanner: React.FC<QRScannerProps> = ({
               <div className="absolute inset-x-0 top-1/2 h-0.5 bg-indigo-400 opacity-80 animate-pulse"></div>
             </div>
           </div>
+
+          {/* 데모 목적으로 QR 코드 인식 성공 버튼 추가 */}
+          <button
+            onClick={() => {
+              // 테스트용 JSON 데이터로 QR 스캔 성공 시뮬레이션
+              const testQRData = JSON.stringify({
+                merchantName: "테스트 상점",
+                merchantAddress: "0xTest",
+                paymentAmount: 123,
+              });
+              onScanSuccess(testQRData);
+            }}
+            className="mt-8 bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-6 rounded-button font-semibold cursor-pointer shadow-lg"
+          >
+            QR 인식 성공 (테스트)
+          </button>
         </div>
 
         {/* 로딩 오버레이 */}
-        {isLoading && (
+        {/* {isLoading && (
           <div className="absolute inset-0 bg-black bg-opacity-75 flex items-center justify-center z-40">
             <div className="text-white text-center flex flex-col items-center justify-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-4"></div>
               <p>카메라를 준비하는 중...</p>
             </div>
           </div>
-        )}
+        )} */}
 
         {/* 상단 안내 텍스트 */}
         <div className="absolute top-0 inset-x-0 p-6 bg-gradient-to-b from-black via-black/50 to-transparent z-30">
@@ -276,16 +411,7 @@ const QRScanner: React.FC<QRScannerProps> = ({
       </div>
 
       {/* 하단 버튼들 */}
-      <div className="p-6 bg-gradient-to-t from-black via-black/50 to-transparent z-50 space-y-3">
-        <button
-          onClick={() => {
-            stopCamera();
-            onSkipToAmountInput();
-          }}
-          className="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-button font-semibold cursor-pointer shadow-lg"
-        >
-          임시: 금액 입력하기
-        </button>
+      <div className="p-6 bg-gradient-to-t from-black via-black/50 to-transparent z-50">
         <button
           onClick={handleCancel}
           className="w-full bg-white text-indigo-600 py-3 rounded-button font-semibold cursor-pointer shadow-lg"
