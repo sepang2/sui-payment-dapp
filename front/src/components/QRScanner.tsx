@@ -347,11 +347,6 @@ const QRScanner: React.FC<QRScannerProps> = ({ onCancel, onScanSuccess }) => {
               playsInline
               muted
               controls={false}
-              webkit-playsinline="true"
-              style={{
-                WebkitTransform: "translateZ(0)",
-                transform: "translateZ(0)",
-              }}
             />
 
             {/* 프레임 테두리 */}
