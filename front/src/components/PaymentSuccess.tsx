@@ -10,7 +10,7 @@ const PaymentSuccess: React.FC<PaymentSuccessProps> = ({
   merchantName,
 }) => {
   return (
-    <div className="fixed inset-0 bg-white flex flex-col items-center justify-center p-6">
+    <div className="fixed inset-0 bg-white flex flex-col items-center justify-center p-6 gap-4">
       <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6">
         <i className="fas fa-check text-3xl text-green-600"></i>
       </div>

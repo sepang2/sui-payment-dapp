@@ -45,7 +45,9 @@ const PaymetApp: React.FC = () => {
   const skipToAmountInput = () => {
     setEnteringAmount(true);
     setMerchantName("테스트 상점"); // 임시 상점명
-    setMerchantAddress("0x1234567890abcdef1234567890abcdef12345678"); // 임시 주소
+    setMerchantAddress(
+      "0x300531bea222e2451a537512d49e77432c061d6afe3a512c2747911a02b82446",
+    ); // 임시 주소
   };
 
   const handleQRScanSuccess = (result: string) => {
@@ -83,6 +85,7 @@ const PaymetApp: React.FC = () => {
       });
     } else {
       setAmount((prev) => {
+        // "0"인 경우에만 숫자로 교체 (소수점이 있는 경우는 제외)
         if (prev === "0") return key;
         return prev + key;
       });
@@ -104,7 +107,7 @@ const PaymetApp: React.FC = () => {
     if (!account || !merchantAddress) return;
 
     const numericAmount = parseFloat(amount);
-    const discount = numericAmount * 0.05; // 5% 할인
+    const discount = numericAmount * 1; // 5% 할인 = 0.05
     const finalAmount = numericAmount - discount;
 
     const paymentRequest: PaymentRequest = {
@@ -119,13 +122,13 @@ const PaymetApp: React.FC = () => {
       setConfirmingPayment(false);
       setPaymentSuccess(true);
 
-      // 5초 후 초기 화면으로 돌아가기
+      // 3초 후 초기 화면으로 돌아가기
       setTimeout(() => {
         setPaymentSuccess(false);
         setAmount("0");
         setMerchantName("");
         setMerchantAddress("");
-      }, 5000);
+      }, 3000);
     } catch (error) {
       console.error("Payment failed:", error);
       // 에러 처리 로직 추가 가능

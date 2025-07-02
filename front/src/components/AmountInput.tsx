@@ -18,8 +18,8 @@ const AmountInput: React.FC<AmountInputProps> = ({
   onCancel,
   onProceed,
 }) => {
-  const displayAmount = parseFloat(amount) || 0;
-  const coinAmount = displayAmount.toLocaleString();
+  // 원본 amount 문자열을 그대로 사용하여 소수점 입력 과정을 정확히 표시
+  const coinAmount = amount === "0" ? "0" : amount;
   const availableCoin = balance.toLocaleString();
 
   return (
@@ -47,6 +47,9 @@ const AmountInput: React.FC<AmountInputProps> = ({
             {coinAmount} SUI
           </p>
           <p className="text-gray-500">지갑 잔고 {availableCoin} SUI</p>
+          {parseFloat(amount) > balance && (
+            <p className="text-red-500 text-sm mt-2 pt-1">잔고가 부족합니다</p>
+          )}
         </div>
       </div>
 
@@ -60,7 +63,7 @@ const AmountInput: React.FC<AmountInputProps> = ({
         </button>
         <button
           onClick={onProceed}
-          disabled={displayAmount <= 0}
+          disabled={parseFloat(amount) <= 0 || parseFloat(amount) > balance}
           className="bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-300 text-white py-4 rounded-lg font-semibold text-lg transition-colors w-full"
         >
           다음

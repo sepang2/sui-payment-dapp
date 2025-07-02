@@ -52,7 +52,7 @@ const PaymentConfirmation: React.FC<PaymentConfirmationProps> = ({
             <div className="border-t border-gray-200 my-3 pb-4"></div>
             <div className="flex justify-between">
               <p className="text-lg font-bold text-gray-900">총 결제 금액</p>
-              <div>
+              <div className="flex flex-col items-end">
                 <p className="text-lg font-bold text-gray-900">
                   {finalAmount.toFixed(3)} SUI
                 </p>
@@ -63,25 +63,32 @@ const PaymentConfirmation: React.FC<PaymentConfirmationProps> = ({
             </div>
           </div>
         </div>
+      </div>
 
-        {/* 보안 텍스트 */}
-        <div className="text-center mb-6 p-4">
-          <p className="text-sm text-gray-500">보유하신 코인으로 결제할게요</p>
-        </div>
-        <div className="border-t border-gray-200 my-3 pb-4"></div>
-        {/* 지갑 정보 */}
-        <div className="space-y-2 mb-8">
-          <div className="flex justify-between">
-            <p className="text-gray-700">보유 코인</p>
-            <p className="text-gray-900">{balance.toLocaleString()} SUI</p>
-          </div>
-          <div className="flex justify-between">
-            <p className="text-gray-700">출금 지갑</p>
-            <p className="text-gray-900">
-              {walletAddress
-                ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`
-                : "N/A"}
+      {/* 하단 정보 섹션 */}
+      <div className="px-6 pb-6">
+        <div className="flex flex-col">
+          {/* 보안 텍스트 */}
+          <div className="text-center mb-6 p-6">
+            <p className="text-sm text-gray-500">
+              보유하신 코인으로 결제할게요
             </p>
+          </div>
+          <div className="border-t border-gray-200 my-3 pb-4"></div>
+          {/* 지갑 정보 */}
+          <div className="space-y-3">
+            <div className="flex justify-between py-2">
+              <p className="text-gray-700">보유 코인</p>
+              <p className="text-gray-900">{balance.toLocaleString()} SUI</p>
+            </div>
+            <div className="flex justify-between py-2">
+              <p className="text-gray-700">출금 지갑</p>
+              <p className="text-gray-900">
+                {walletAddress
+                  ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`
+                  : "N/A"}
+              </p>
+            </div>
           </div>
         </div>
       </div>
