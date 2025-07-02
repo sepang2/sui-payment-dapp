@@ -107,7 +107,7 @@ const PaymetApp: React.FC = () => {
     if (!account || !merchantAddress) return;
 
     const numericAmount = parseFloat(amount);
-    const discount = numericAmount * 1; // 5% 할인 = 0.05
+    const discount = numericAmount * 0;
     const finalAmount = numericAmount - discount;
 
     const paymentRequest: PaymentRequest = {

@@ -21,9 +21,15 @@ export function usePayment() {
     setIsProcessing(true);
 
     try {
-      const finalAmount = paymentRequest.discount
-        ? paymentRequest.amount - paymentRequest.discount
-        : paymentRequest.amount;
+      // PaymentApp에서 이미 할인이 적용된 최종 금액을 받으므로 그대로 사용
+      const finalAmount = paymentRequest.amount;
+
+      // 유효성 검사: 금액이 양수인지 확인
+      if (finalAmount <= 0) {
+        throw new Error(
+          `Invalid payment amount: ${finalAmount}. Amount must be greater than 0.`,
+        );
+      }
 
       const transaction = createSuiTransferTransaction(
         paymentRequest.merchantAddress,
