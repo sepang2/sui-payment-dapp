@@ -3,7 +3,7 @@ import { useState, useCallback } from "react";
 export interface QRScanResult {
   merchantAddress: string;
   merchantName?: string;
-  maxAmount?: number;
+  paymentAmount?: number;
 }
 
 export function useQRScanner() {

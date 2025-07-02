@@ -48,6 +48,7 @@ const PaymetApp: React.FC = () => {
     setMerchantAddress(
       "0x300531bea222e2451a537512d49e77432c061d6afe3a512c2747911a02b82446",
     ); // 임시 주소
+    setAmount("5.5"); // 임시 결제 금액 (QR 코드에서 받은 것처럼)
   };
 
   const handleQRScanSuccess = (result: string) => {
@@ -62,6 +63,7 @@ const PaymetApp: React.FC = () => {
       setEnteringAmount(true);
       setMerchantName(scanResult.merchantName || "Unknown Merchant");
       setMerchantAddress(scanResult.merchantAddress);
+      setAmount(scanResult.paymentAmount?.toString() || "0");
       clearResult();
     }
   }, [scanResult, qrError, clearResult]);
