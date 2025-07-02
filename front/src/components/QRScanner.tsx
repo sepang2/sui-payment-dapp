@@ -34,8 +34,8 @@ const QRScanner: React.FC<QRScannerProps> = ({ onCancel, onScanSuccess }) => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
-          width: { ideal: 1280, min: 640 },
-          height: { ideal: 720, min: 480 },
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
           facingMode: { ideal: "environment" },
         },
         audio: false,
@@ -43,34 +43,22 @@ const QRScanner: React.FC<QRScannerProps> = ({ onCancel, onScanSuccess }) => {
 
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
+        videoRef.current.play();
 
-        // iOS Safari 호환성을 위한 비디오 재생 처리
-        const playPromise = videoRef.current.play();
-        if (playPromise !== undefined) {
-          playPromise.catch((error) => {
-            console.error("Video play error:", error);
-          });
-        }
-
-        // iOS에서 비디오 안정화를 위한 짧은 지연
-        setTimeout(() => {
-          if (videoRef.current) {
-            qrScannerRef.current = new QrScanner(
-              videoRef.current,
-              (result) => onScanSuccess(result.data),
-              {
-                onDecodeError: (error) => {
-                  if (error !== "No QR code found") {
-                    console.error("QR Scanner error: ", error);
-                  }
-                },
-                returnDetailedScanResult: true,
-              },
-            );
-            qrScannerRef.current.start();
-            // setIsScanning(true);
-          }
-        }, 300);
+        qrScannerRef.current = new QrScanner(
+          videoRef.current,
+          (result) => onScanSuccess(result.data),
+          {
+            onDecodeError: (error) => {
+              if (error !== "No QR code found") {
+                console.error("QR Scanner error: ", error);
+              }
+            },
+            returnDetailedScanResult: true,
+          },
+        );
+        qrScannerRef.current.start();
+        // setIsScanning(true);
       }
     } catch (err) {
       if (err === "OverconstrainedError") {
@@ -101,8 +89,8 @@ const QRScanner: React.FC<QRScannerProps> = ({ onCancel, onScanSuccess }) => {
       try {
         await navigator.mediaDevices.getUserMedia({
           video: {
-            width: { ideal: 1280, min: 640 },
-            height: { ideal: 720, min: 480 },
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
             facingMode: { ideal: "environment" },
           },
           audio: false,
@@ -359,10 +347,6 @@ const QRScanner: React.FC<QRScannerProps> = ({ onCancel, onScanSuccess }) => {
               playsInline
               muted
               controls={false}
-              style={{
-                WebkitTransform: "translateZ(0)",
-                transform: "translateZ(0)",
-              }}
             />
 
             {/* 프레임 테두리 */}
