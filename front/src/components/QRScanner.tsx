@@ -345,8 +345,6 @@ const QRScanner: React.FC<QRScannerProps> = ({ onCancel, onScanSuccess }) => {
               className="absolute inset-0 w-full h-full object-cover rounded-lg"
               autoPlay
               playsInline
-              muted
-              controls={false}
             />
 
             {/* 프레임 테두리 */}
