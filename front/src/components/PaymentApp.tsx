@@ -41,16 +41,6 @@ const PaymetApp: React.FC = () => {
     startScanning();
   };
 
-  // 임시: QR 스캔 없이 바로 결제 금액 입력으로 넘어가기
-  const skipToAmountInput = () => {
-    setEnteringAmount(true);
-    setMerchantName("테스트 상점"); // 임시 상점명
-    setMerchantAddress(
-      "0x300531bea222e2451a537512d49e77432c061d6afe3a512c2747911a02b82446",
-    ); // 임시 주소
-    setAmount("5.5"); // 임시 결제 금액 (QR 코드에서 받은 것처럼)
-  };
-
   const handleQRScanSuccess = (result: string) => {
     // QR 스캔 결과를 처리
     handleScanResult(result);
@@ -161,7 +151,6 @@ const PaymetApp: React.FC = () => {
           <QRScanner
             onCancel={cancelQRScan}
             onScanSuccess={handleQRScanSuccess}
-            onSkipToAmountInput={skipToAmountInput}
           />
         )}
 

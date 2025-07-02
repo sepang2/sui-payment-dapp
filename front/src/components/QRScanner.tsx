@@ -1,26 +1,21 @@
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, { useEffect, useRef, useCallback } from "react";
 import QrScanner from "qr-scanner";
 
 interface QRScannerProps {
   onCancel: () => void;
   onScanSuccess: (result: string) => void;
-  onSkipToAmountInput: () => void;
 }
 
-const QRScanner: React.FC<QRScannerProps> = ({
-  onCancel,
-  onScanSuccess,
-  onSkipToAmountInput,
-}) => {
+const QRScanner: React.FC<QRScannerProps> = ({ onCancel, onScanSuccess }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const qrScannerRef = useRef<QrScanner | null>(null);
-  // const streamRef = useRef<MediaStream | null>(null);
+
   // const mountedRef = useRef<boolean>(true);
 
   // const [hasCamera, setHasCamera] = useState<boolean>(true);
   // const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [isScanning, setIsScanning] = useState<boolean>(false);
-  const [error, setError] = useState<string>("");
+  // const [isScanning, setIsScanning] = useState<boolean>(false);
+  // const [error, setError] = useState<string>("");
 
   // 카메라 권한 확인 함수
   const checkCameraPermission = async () => {
@@ -63,7 +58,7 @@ const QRScanner: React.FC<QRScannerProps> = ({
           },
         );
         qrScannerRef.current.start();
-        setIsScanning(true);
+        // setIsScanning(true);
       }
     } catch (err) {
       if (err === "OverconstrainedError") {
@@ -71,9 +66,9 @@ const QRScanner: React.FC<QRScannerProps> = ({
       } else {
         console.error("Error accessing camera: ", err);
       }
-      setError(
-        "카메라 접근이 거부되었습니다. 카메라 접근을 허용하고 다시 시도해주세요.",
-      );
+      // setError(
+      //   "카메라 접근이 거부되었습니다. 카메라 접근을 허용하고 다시 시도해주세요.",
+      // );
     }
   };
 
@@ -104,12 +99,12 @@ const QRScanner: React.FC<QRScannerProps> = ({
         await activateCamera();
       } catch (err) {
         console.error("Error accessing camera after permission prompt: ", err);
-        setError("카메라 접근이 거부되었습니다. 다시 시도해주세요.");
+        // setError("카메라 접근이 거부되었습니다. 다시 시도해주세요.");
       }
     } else {
-      setError(
-        "카메라 접근이 차단되었습니다. 설정에서 카메라 권한을 허용해주세요.",
-      );
+      // setError(
+      //   "카메라 접근이 차단되었습니다. 설정에서 카메라 권한을 허용해주세요.",
+      // );
     }
   };
 
@@ -120,7 +115,7 @@ const QRScanner: React.FC<QRScannerProps> = ({
       tracks.forEach((track) => track.stop());
       videoRef.current.srcObject = null;
       qrScannerRef.current?.stop();
-      setIsScanning(false);
+      // setIsScanning(false);
     }
   };
 
