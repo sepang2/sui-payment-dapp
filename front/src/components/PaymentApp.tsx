@@ -131,7 +131,7 @@ const PaymetApp: React.FC = () => {
   const displayBalance = balanceLoading ? 0 : walletBalance;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* 헤더 */}
       <Header
         walletConnected={walletConnected}
