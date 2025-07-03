@@ -66,10 +66,6 @@ const Dashboard: React.FC<DashboardProps> = ({
             <i className="fas fa-qrcode"></i>
             QR 코드 스캔하기
           </button>
-          <button className="bg-white border border-indigo-600 text-indigo-600 hover:bg-indigo-50 py-4 px-6 rounded-button text-lg font-semibold flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap">
-            <i className="fas fa-plus-circle"></i>
-            SUI 충전하기
-          </button>
         </div>
         <div className="mt-8 w-full py-2">
           <h3 className="text-lg font-semibold text-gray-700 mb-3 py-2">
@@ -79,16 +75,16 @@ const Dashboard: React.FC<DashboardProps> = ({
             <div className="bg-white rounded-lg shadow-sm p-4 mb-3">
               <div className="flex justify-between items-center">
                 <div>
-                  <p className="font-medium">커피숍 123</p>
+                  <p className="font-medium">카페 라떼</p>
                   <p className="text-sm text-gray-500">2025-07-01 09:30</p>
                 </div>
-                <p className="text-red-500 font-medium">-0.125 SUI</p>
+                <p className="text-red-500 font-medium">-0.450 SUI</p>
               </div>
             </div>
             <div className="bg-white rounded-lg shadow-sm p-4">
               <div className="flex justify-between items-center">
                 <div>
-                  <p className="font-medium">레스토랑 XYZ</p>
+                  <p className="font-medium">아이스 아메리카노</p>
                   <p className="text-sm text-gray-500">2025-06-30 19:45</p>
                 </div>
                 <p className="text-red-500 font-medium">-0.350 SUI</p>

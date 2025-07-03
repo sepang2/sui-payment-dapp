@@ -88,10 +88,7 @@ const Header: React.FC<HeaderProps> = ({ walletConnected, walletAddress }) => {
       <div className="flex justify-center">
         <div className="w-full max-w-md px-6 py-3 flex justify-between items-center relative">
           <div className="flex items-center">
-            <div className="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center mr-2">
-              <i className="fas fa-wallet text-white"></i>
-            </div>
-            <h1 className="text-xl font-bold text-gray-800 pl-2">SUI 페이</h1>
+            <h1 className="text-xl font-bold text-gray-800 pl-2">DSRV x Sui</h1>
           </div>
           {!walletConnected ? (
             <div className="connect-wallet-container">
