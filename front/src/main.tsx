@@ -6,17 +6,17 @@ import "@radix-ui/themes/styles.css";
 
 import { SuiClientProvider, WalletProvider } from "@mysten/dapp-kit";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Theme } from "@radix-ui/themes";
 import App from "./App.tsx";
 import { networkConfig } from "./utils/network.ts";
 import { DarkModeProvider } from "./contexts/DarkModeContext.tsx";
+import ThemeWrapper from "./components/ThemeWrapper.tsx";
 
 const queryClient = new QueryClient();
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <DarkModeProvider>
-      <Theme appearance="light">
+      <ThemeWrapper>
         <QueryClientProvider client={queryClient}>
           <SuiClientProvider networks={networkConfig} defaultNetwork="testnet">
             <WalletProvider autoConnect>
@@ -24,7 +24,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             </WalletProvider>
           </SuiClientProvider>
         </QueryClientProvider>
-      </Theme>
+      </ThemeWrapper>
     </DarkModeProvider>
   </React.StrictMode>,
 );

@@ -20,7 +20,7 @@ export const useDarkMode = () => {
 export const DarkModeProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(true);
 
   useEffect(() => {
     // 초기 로드 시 localStorage에서 다크모드 설정 확인
@@ -28,11 +28,8 @@ export const DarkModeProvider: React.FC<{ children: React.ReactNode }> = ({
     if (savedDarkMode) {
       setIsDarkMode(JSON.parse(savedDarkMode));
     } else {
-      // localStorage에 설정이 없다면 시스템 설정 확인
-      const systemPrefersDark = window.matchMedia(
-        "(prefers-color-scheme: dark)",
-      ).matches;
-      setIsDarkMode(systemPrefersDark);
+      // localStorage에 설정이 없다면 다크모드를 기본으로 설정
+      setIsDarkMode(true);
     }
   }, []);
 
