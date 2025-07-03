@@ -22,8 +22,9 @@ const PaymentConfirmation: React.FC<PaymentConfirmationProps> = ({
   onConfirm,
 }) => {
   const originalAmount = parseFloat(amount);
-  const discount = originalAmount * 0.05; // 5% 할인 가정
-  const finalAmount = originalAmount - discount;
+  const discountRate = 0.05;
+  const discountAmount = originalAmount * discountRate; // 5% 할인 가정
+  const finalAmount = originalAmount - discountAmount;
 
   return (
     <div className="fixed inset-0 bg-white flex flex-col">
@@ -48,8 +49,8 @@ const PaymentConfirmation: React.FC<PaymentConfirmationProps> = ({
               <p className="text-gray-900">{originalAmount.toFixed(3)} SUI</p>
             </div>
             <div className="flex justify-between text-indigo-600 py-4">
-              <p>할인 (5%)</p>
-              <p>-{discount.toFixed(3)} SUI</p>
+              <p>할인 ({discountRate * 100}%)</p>
+              <p>-{discountAmount.toFixed(3)} SUI</p>
             </div>
             <div className="border-t border-gray-200 my-3 pb-4"></div>
             <div className="flex justify-between">
@@ -59,7 +60,7 @@ const PaymentConfirmation: React.FC<PaymentConfirmationProps> = ({
                   {finalAmount.toFixed(3)} SUI
                 </p>
                 <p className="text-gray-900 text-sm">
-                  ≈ {(balance * 3500).toLocaleString()} 원
+                  ≈ {(finalAmount * 3500).toLocaleString()} 원
                 </p>
               </div>
             </div>

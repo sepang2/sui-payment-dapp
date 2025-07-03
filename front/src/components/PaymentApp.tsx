@@ -99,14 +99,15 @@ const PaymetApp: React.FC = () => {
     if (!account || !merchantAddress) return;
 
     const numericAmount = parseFloat(amount);
-    const discount = numericAmount * 0;
-    const finalAmount = numericAmount - discount;
+    const discountRate = 0.05;
+    const discountAmount = numericAmount * discountRate;
+    const finalAmount = numericAmount - discountAmount;
 
     const paymentRequest: PaymentRequest = {
       merchantAddress,
       amount: finalAmount,
       merchantName,
-      discount,
+      discountAmount,
     };
 
     try {

@@ -6,7 +6,7 @@ export interface PaymentRequest {
   merchantAddress: string;
   amount: number;
   merchantName?: string;
-  discount?: number;
+  discountAmount?: number;
 }
 
 export function usePayment() {
