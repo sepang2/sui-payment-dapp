@@ -14,7 +14,11 @@ import BottomNavigation from "./BottomNavigation";
 
 const PaymetApp: React.FC = () => {
   const account = useCurrentAccount();
-  const { balance, isPending: balanceLoading } = useBalance();
+  const {
+    balance,
+    isPending: balanceLoading,
+    refetch: refetchBalance,
+  } = useBalance();
   const { processPayment, isProcessing } = usePayment();
   const {
     scanResult,
@@ -121,6 +125,7 @@ const PaymetApp: React.FC = () => {
         setAmount("0");
         setMerchantName("");
         setMerchantAddress("");
+        refetchBalance();
       }, 3000);
     } catch (error) {
       console.error("Payment failed:", error);
