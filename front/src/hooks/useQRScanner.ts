@@ -3,7 +3,7 @@ import { useState, useCallback } from "react";
 export interface QRScanResult {
   merchantAddress: string;
   merchantName?: string;
-  paymentAmount?: number;
+  lumaLink?: string;
 }
 
 export function useQRScanner() {

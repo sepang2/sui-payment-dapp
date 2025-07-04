@@ -36,6 +36,7 @@ const PaymetApp: React.FC = () => {
   const [amount, setAmount] = useState<string>("0");
   const [merchantName, setMerchantName] = useState<string>("");
   const [merchantAddress, setMerchantAddress] = useState<string>("");
+  const [lumaLink, setLumaLink] = useState<string>("");
 
   const walletConnected = !!account;
   const walletBalance = balance;
@@ -57,7 +58,8 @@ const PaymetApp: React.FC = () => {
       setEnteringAmount(true);
       setMerchantName(scanResult.merchantName || "Unknown Merchant");
       setMerchantAddress(scanResult.merchantAddress);
-      setAmount(scanResult.paymentAmount?.toString() || "0");
+      setLumaLink(scanResult.lumaLink || "");
+      setAmount("0"); // 사용자가 직접 입력하도록 "0"으로 설정
       clearResult();
     }
   }, [scanResult, qrError, clearResult]);
@@ -97,6 +99,7 @@ const PaymetApp: React.FC = () => {
     setEnteringAmount(false);
     setConfirmingPayment(false);
     setAmount("0");
+    setLumaLink("");
   };
 
   const confirmPayment = async () => {
@@ -125,6 +128,7 @@ const PaymetApp: React.FC = () => {
         setAmount("0");
         setMerchantName("");
         setMerchantAddress("");
+        setLumaLink("");
         refetchBalance();
       }, 3000);
     } catch (error) {

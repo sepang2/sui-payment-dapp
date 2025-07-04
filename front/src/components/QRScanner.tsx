@@ -368,7 +368,7 @@ const QRScanner: React.FC<QRScannerProps> = ({ onCancel, onScanSuccess }) => {
               const testQRData = JSON.stringify({
                 merchantName: "테스트 상점",
                 merchantAddress: "0xTest",
-                paymentAmount: 123,
+                lumaLink: "https://luma.com/event/test123",
               });
               onScanSuccess(testQRData);
             }}
