@@ -234,7 +234,8 @@ const PaymentApp: React.FC = () => {
           <PaymentConfirmation
             amount={amount}
             name={name}
-            walletAddress={walletAddress}
+            senderWalletAddress={account?.address || ""}
+            receiverWalletAddress={walletAddress}
             balance={displayBalance}
             isProcessing={isProcessing}
             onCancel={cancelPayment}

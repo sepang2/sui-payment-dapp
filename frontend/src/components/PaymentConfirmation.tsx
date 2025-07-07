@@ -6,7 +6,8 @@ interface PaymentConfirmationProps {
   amount: string;
   name: string;
   balance: number;
-  walletAddress: string;
+  senderWalletAddress: string;
+  receiverWalletAddress: string;
   isProcessing: boolean;
   onCancel: () => void;
   onConfirm: () => void;
@@ -16,7 +17,8 @@ const PaymentConfirmation: React.FC<PaymentConfirmationProps> = ({
   amount,
   name,
   balance,
-  walletAddress,
+  senderWalletAddress,
+  receiverWalletAddress,
   isProcessing,
   onCancel,
   onConfirm,
@@ -77,13 +79,13 @@ const PaymentConfirmation: React.FC<PaymentConfirmationProps> = ({
             <div className="flex justify-between py-2">
               <p className="text-gray-700 dark:text-gray-300">결제 지갑</p>
               <p className="text-gray-900 dark:text-white">
-                {walletAddress ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}` : "N/A"}
+                {senderWalletAddress ? `${senderWalletAddress.slice(0, 6)}...${senderWalletAddress.slice(-4)}` : "N/A"}
               </p>
             </div>
             <div className="flex justify-between py-2">
               <p className="text-gray-700 dark:text-gray-300">받는 지갑</p>
               <p className="text-gray-900 dark:text-white">
-                {walletAddress ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}` : "N/A"}
+                {receiverWalletAddress ? `${receiverWalletAddress.slice(0, 6)}...${receiverWalletAddress.slice(-4)}` : "N/A"}
               </p>
             </div>
           </div>
