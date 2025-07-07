@@ -6,6 +6,7 @@ import { useCurrentAccount } from "@mysten/dapp-kit";
 import { useBalance } from "../hooks/useBalance";
 import { usePayment, PaymentRequest } from "../hooks/usePayment";
 import { useQRScanner } from "../hooks/useQRScanner";
+import { useUser } from "../hooks/useUser";
 import Header from "./Header";
 import Dashboard from "./Dashboard";
 import QRScanner from "./QRScanner";
@@ -13,17 +14,22 @@ import AmountInput from "./AmountInput";
 import PaymentConfirmation from "./PaymentConfirmation";
 import PaymentSuccess from "./PaymentSuccess";
 import BottomNavigation from "./BottomNavigation";
+import UserRegistration from "./UserRegistration";
+import QRCodeDisplay from "./QRCodeDisplay";
 
 const PaymentApp: React.FC = () => {
   const account = useCurrentAccount();
   const { balance, isPending: balanceLoading, refetch: refetchBalance } = useBalance();
   const { processPayment, isProcessing } = usePayment();
   const { scanResult, error: qrError, startScanning, stopScanning, handleScanResult, clearResult } = useQRScanner();
+  const { user, isNewUser, isLoading: userLoading, checkUser, clearUser } = useUser();
 
   const [scanningQR, setScanningQR] = useState<boolean>(false);
   const [enteringAmount, setEnteringAmount] = useState<boolean>(false);
   const [confirmingPayment, setConfirmingPayment] = useState<boolean>(false);
   const [paymentSuccess, setPaymentSuccess] = useState<boolean>(false);
+  const [showRegistration, setShowRegistration] = useState<boolean>(false);
+  const [showQRCode, setShowQRCode] = useState<boolean>(false);
   const [amount, setAmount] = useState<string>("0");
   const [merchantName, setMerchantName] = useState<string>("");
   const [merchantAddress, setMerchantAddress] = useState<string>("");
@@ -34,9 +40,36 @@ const PaymentApp: React.FC = () => {
   const walletConnected = !!account;
   const walletBalance = balance;
 
+  // 지갑 연결 상태 변화 감지 및 사용자 정보 확인
+  useEffect(() => {
+    if (account?.address) {
+      checkUser(account.address);
+    } else {
+      clearUser();
+      setShowRegistration(false);
+    }
+  }, [account?.address, checkUser, clearUser]);
+
+  // 신규 가입자인 경우 등록 화면 표시
+  useEffect(() => {
+    if (walletConnected && isNewUser && !userLoading) {
+      setShowRegistration(true);
+    }
+  }, [walletConnected, isNewUser, userLoading]);
+
   const startQRScan = () => {
     setScanningQR(true);
     startScanning();
+  };
+
+  const makeQRCode = () => {
+    if (walletConnected && user) {
+      setShowQRCode(true);
+    }
+  };
+
+  const closeQRCode = () => {
+    setShowQRCode(false);
   };
 
   const handleQRScanSuccess = (result: string) => {
@@ -130,7 +163,23 @@ const PaymentApp: React.FC = () => {
     }
   };
 
+  const handleRegistrationComplete = () => {
+    setShowRegistration(false);
+    // 사용자 정보 다시 조회
+    if (account?.address) {
+      checkUser(account.address);
+    }
+  };
+
+  const handleRegistrationCancel = () => {
+    setShowRegistration(false);
+    // 필요한 경우 지갑 연결 해제 로직 추가 가능
+  };
+
   const displayBalance = balanceLoading ? 0 : walletBalance;
+
+  // 로딩 중이거나 등록 화면이 표시되는 경우의 처리
+  const shouldShowMainContent = walletConnected && !showRegistration && !userLoading;
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -139,12 +188,37 @@ const PaymentApp: React.FC = () => {
 
       {/* 메인 콘텐츠 */}
       <main className="pb-20">
-        <Dashboard
-          walletConnected={walletConnected}
-          balance={displayBalance}
-          balanceLoading={balanceLoading}
-          onStartQRScan={startQRScan}
-        />
+        {/* 사용자 정보 로딩 중 */}
+        {userLoading && walletConnected && (
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              <p className="text-gray-600 dark:text-gray-400">사용자 정보를 확인하는 중...</p>
+            </div>
+          </div>
+        )}
+
+        {/* 대시보드 */}
+        {shouldShowMainContent && (
+          <Dashboard
+            walletConnected={walletConnected}
+            balance={displayBalance}
+            balanceLoading={balanceLoading}
+            onMakeQRCode={makeQRCode}
+            onScanQRCode={startQRScan}
+          />
+        )}
+
+        {/* 지갑 연결되지 않은 경우 */}
+        {!walletConnected && (
+          <Dashboard
+            walletConnected={false}
+            balance={0}
+            balanceLoading={false}
+            onMakeQRCode={makeQRCode}
+            onScanQRCode={startQRScan}
+          />
+        )}
 
         {/* QR 코드 스캔 화면 */}
         {scanningQR && <QRScanner onCancel={cancelQRScan} onScanSuccess={handleQRScanSuccess} />}
@@ -181,8 +255,37 @@ const PaymentApp: React.FC = () => {
 
       {/* 하단 네비게이션 */}
       <BottomNavigation
-        visible={walletConnected && !scanningQR && !enteringAmount && !confirmingPayment && !paymentSuccess}
+        visible={
+          shouldShowMainContent &&
+          !scanningQR &&
+          !enteringAmount &&
+          !confirmingPayment &&
+          !paymentSuccess &&
+          !showQRCode
+        }
       />
+
+      {/* 신규 가입자 등록 화면 */}
+      {showRegistration && account?.address && (
+        <UserRegistration
+          walletAddress={account.address}
+          onRegistrationComplete={handleRegistrationComplete}
+          onCancel={handleRegistrationCancel}
+        />
+      )}
+
+      {/* QR 코드 표시 화면 */}
+      {showQRCode && user && (
+        <QRCodeDisplay
+          user={{
+            name: user.name,
+            description: user.description || undefined,
+            walletAddress: user.walletAddress,
+            qrCode: user.qrCode || undefined,
+          }}
+          onClose={closeQRCode}
+        />
+      )}
     </div>
   );
 };

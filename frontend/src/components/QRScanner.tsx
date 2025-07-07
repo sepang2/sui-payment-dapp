@@ -25,8 +25,9 @@ const QRScanner: React.FC<QRScannerProps> = ({ onCancel, onScanSuccess }) => {
     }
   };
 
-  const activateCamera = async () => {
+  const startCamera = async () => {
     try {
+      // 카메라 스트림 요청
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
           width: { ideal: 1280 },
@@ -37,66 +38,72 @@ const QRScanner: React.FC<QRScannerProps> = ({ onCancel, onScanSuccess }) => {
       });
 
       if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        videoRef.current.play();
+        // 기존 스트림이 있다면 정리
+        if (videoRef.current.srcObject) {
+          const oldStream = videoRef.current.srcObject as MediaStream;
+          oldStream.getTracks().forEach((track) => track.stop());
+        }
 
-        qrScannerRef.current = new QrScanner(videoRef.current, (result) => onScanSuccess(result.data), {
-          onDecodeError: (error) => {
-            if (error !== "No QR code found") {
-              console.error("QR Scanner error: ", error);
-            }
-          },
-          returnDetailedScanResult: true,
-        });
-        qrScannerRef.current.start();
+        videoRef.current.srcObject = stream;
+
+        // 비디오 로드 후 재생
+        videoRef.current.onloadedmetadata = () => {
+          if (videoRef.current) {
+            videoRef.current
+              .play()
+              .then(() => {
+                console.log("Video started playing successfully");
+
+                // QR 스캐너 초기화
+                if (qrScannerRef.current) {
+                  qrScannerRef.current.stop();
+                  qrScannerRef.current = null;
+                }
+
+                qrScannerRef.current = new QrScanner(videoRef.current!, (result: any) => onScanSuccess(result.data), {
+                  onDecodeError: (error) => {
+                    if (error !== "No QR code found") {
+                      console.error("QR Scanner error: ", error);
+                    }
+                  },
+                  returnDetailedScanResult: true,
+                });
+                qrScannerRef.current.start();
+              })
+              .catch((error) => {
+                console.error("Error playing video: ", error);
+              });
+          }
+        };
+
+        // 권한 성공 시 로컬 스토리지에 저장
+        localStorage.setItem("cameraPermission", "granted");
       }
     } catch (err) {
-      if (err === "OverconstrainedError") {
-        console.error("OverconstrainedError: 카메라 설정을 지원하지 않습니다.");
-      } else {
-        console.error("Error accessing camera: ", err);
-      }
-    }
-  };
-
-  const startCamera = async () => {
-    const cameraPermission = localStorage.getItem("cameraPermission");
-
-    if (cameraPermission === "granted") {
-      await activateCamera();
-      return;
-    }
-
-    const permissionState = await checkCameraPermission();
-
-    if (permissionState === "granted") {
-      localStorage.setItem("cameraPermission", "granted");
-      await activateCamera();
-    } else if (permissionState === "prompt") {
-      try {
-        await navigator.mediaDevices.getUserMedia({
-          video: {
-            width: { ideal: 1280 },
-            height: { ideal: 720 },
-            facingMode: { ideal: "environment" },
-          },
-          audio: false,
-        });
-        localStorage.setItem("cameraPermission", "granted");
-        await activateCamera();
-      } catch (err) {
-        console.error("Error accessing camera after permission prompt: ", err);
+      console.error("Error accessing camera: ", err);
+      if (err instanceof Error) {
+        if (err.name === "OverconstrainedError") {
+          console.error("OverconstrainedError: 카메라 설정을 지원하지 않습니다.");
+        } else if (err.name === "NotAllowedError") {
+          console.error("NotAllowedError: 카메라 접근 권한이 거부되었습니다.");
+        } else if (err.name === "NotFoundError") {
+          console.error("NotFoundError: 카메라를 찾을 수 없습니다.");
+        }
       }
     }
   };
 
   const stopCamera = () => {
+    if (qrScannerRef.current) {
+      qrScannerRef.current.stop();
+      qrScannerRef.current = null;
+    }
+
     if (videoRef.current && videoRef.current.srcObject) {
       const stream = videoRef.current.srcObject as MediaStream;
       const tracks = stream.getTracks();
       tracks.forEach((track) => track.stop());
       videoRef.current.srcObject = null;
-      qrScannerRef.current?.stop();
     }
   };
 
@@ -106,13 +113,10 @@ const QRScanner: React.FC<QRScannerProps> = ({ onCancel, onScanSuccess }) => {
   }, [onCancel]);
 
   useEffect(() => {
-    const startCam = async () => {
-      await startCamera();
-    };
-    startCam();
+    startCamera();
 
     return () => stopCamera();
-  }, [startCamera]);
+  }, []);
 
   return (
     <div className="fixed inset-0 bg-black flex flex-col z-50">

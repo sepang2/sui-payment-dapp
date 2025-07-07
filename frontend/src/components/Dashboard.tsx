@@ -7,10 +7,11 @@ interface DashboardProps {
   walletConnected: boolean;
   balance: number;
   balanceLoading: boolean;
-  onStartQRScan: () => void;
+  onMakeQRCode: () => void;
+  onScanQRCode: () => void;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ walletConnected, balance, balanceLoading, onStartQRScan }) => {
+const Dashboard: React.FC<DashboardProps> = ({ walletConnected, balance, balanceLoading, onMakeQRCode, onScanQRCode }) => {
   const exchangeRate = 3500; // USD to KRW 환율
   const displayBalance = balanceLoading ? 0 : balance;
 
@@ -51,10 +52,17 @@ const Dashboard: React.FC<DashboardProps> = ({ walletConnected, balance, balance
         </div>
         <div className="grid grid-cols-1 gap-4 w-full py-4">
           <button
-            onClick={onStartQRScan}
+            onClick={onMakeQRCode} // make qr code
             className="bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-700 dark:hover:bg-indigo-800 text-white py-4 px-6 rounded-button text-lg font-semibold flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap"
           >
             <i className="fas fa-qrcode"></i>
+            QR 코드 생성하기
+          </button>
+          <button
+            onClick={onScanQRCode}
+            className="bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-700 dark:hover:bg-indigo-800 text-white py-4 px-6 rounded-button text-lg font-semibold flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap"
+          >
+            <i className="fas fa-camera"></i>
             QR 코드 스캔하기
           </button>
         </div>
