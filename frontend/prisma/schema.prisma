@@ -14,14 +14,16 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// 상점 정보
-model Store {
+// 사용자 정보
+model User {
   id            String   @id @default(cuid())
-  name          String // 상점명
-  walletAddress String   @unique // 상점 지갑 주소
+  name          String // 사용자명
+  description   String? // 사용자 설명
+  walletAddress String   @unique // 사용자 지갑 주소
+  qrCode        String?  @db.LongText // 지갑 주소 QR코드 (base64)
   lumaUrl       String? // Luma 이벤트 URL
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  @@map("stores")
+  @@map("users")
 }
