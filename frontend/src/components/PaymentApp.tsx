@@ -31,11 +31,8 @@ const PaymentApp: React.FC = () => {
   const [showRegistration, setShowRegistration] = useState<boolean>(false);
   const [showQRCode, setShowQRCode] = useState<boolean>(false);
   const [amount, setAmount] = useState<string>("0");
-  const [merchantName, setMerchantName] = useState<string>("");
-  const [merchantAddress, setMerchantAddress] = useState<string>("");
-  const [lumaLink, setLumaLink] = useState<string>("");
-  // lumaLink는 향후 확장을 위해 유지됩니다
-  console.log("Luma link:", lumaLink);
+  const [name, setName] = useState<string>("");
+  const [walletAddress, setWalletAddress] = useState<string>("");
 
   const walletConnected = !!account;
   const walletBalance = balance;
@@ -82,9 +79,8 @@ const PaymentApp: React.FC = () => {
     if (scanResult && !qrError) {
       setScanningQR(false);
       setEnteringAmount(true);
-      setMerchantName(scanResult.merchantName || "Unknown Merchant");
-      setMerchantAddress(scanResult.merchantAddress);
-      setLumaLink(scanResult.lumaLink || "");
+      setName(scanResult.name || "Unknown User");
+      setWalletAddress(scanResult.walletAddress);
       setAmount("0"); // 사용자가 직접 입력하도록 "0"으로 설정
       clearResult();
     }
@@ -125,11 +121,10 @@ const PaymentApp: React.FC = () => {
     setEnteringAmount(false);
     setConfirmingPayment(false);
     setAmount("0");
-    setLumaLink("");
   };
 
   const confirmPayment = async () => {
-    if (!account || !merchantAddress) return;
+    if (!account || !walletAddress) return;
 
     const numericAmount = parseFloat(amount);
     const discountRate = 0.05;
@@ -137,9 +132,9 @@ const PaymentApp: React.FC = () => {
     const finalAmount = numericAmount - discountAmount;
 
     const paymentRequest: PaymentRequest = {
-      merchantAddress,
+      walletAddress,
       amount: finalAmount,
-      merchantName,
+      name,
       discountAmount,
     };
 
@@ -152,9 +147,8 @@ const PaymentApp: React.FC = () => {
       setTimeout(() => {
         setPaymentSuccess(false);
         setAmount("0");
-        setMerchantName("");
-        setMerchantAddress("");
-        setLumaLink("");
+        setName("");
+        setWalletAddress("");
         refetchBalance();
       }, 3000);
     } catch (error) {
@@ -227,7 +221,7 @@ const PaymentApp: React.FC = () => {
         {enteringAmount && (
           <AmountInput
             amount={amount}
-            merchantName={merchantName}
+            name={name}
             balance={displayBalance}
             onKeypadPress={handleKeypadPress}
             onCancel={cancelPayment}
@@ -239,10 +233,9 @@ const PaymentApp: React.FC = () => {
         {confirmingPayment && (
           <PaymentConfirmation
             amount={amount}
-            merchantName={merchantName}
-            merchantAddress={merchantAddress}
+            name={name}
+            walletAddress={walletAddress}
             balance={displayBalance}
-            walletAddress={account?.address}
             isProcessing={isProcessing}
             onCancel={cancelPayment}
             onConfirm={confirmPayment}
@@ -250,7 +243,7 @@ const PaymentApp: React.FC = () => {
         )}
 
         {/* 결제 성공 화면 */}
-        {paymentSuccess && <PaymentSuccess amount={amount} merchantName={merchantName} />}
+        {paymentSuccess && <PaymentSuccess amount={amount} name={name}/>}
       </main>
 
       {/* 하단 네비게이션 */}

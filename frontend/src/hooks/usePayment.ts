@@ -5,9 +5,9 @@ import { useSignAndExecuteTransaction } from "@mysten/dapp-kit";
 import { createSuiTransferTransaction } from "../utils/transaction";
 
 export interface PaymentRequest {
-  merchantAddress: string;
+  walletAddress: string;
   amount: number;
-  merchantName?: string;
+  name?: string;
   discountAmount?: number;
 }
 
@@ -30,7 +30,7 @@ export function usePayment() {
         throw new Error(`Invalid payment amount: ${finalAmount}. Amount must be greater than 0.`);
       }
 
-      const transaction = createSuiTransferTransaction(paymentRequest.merchantAddress, finalAmount);
+      const transaction = createSuiTransferTransaction(paymentRequest.walletAddress, finalAmount);
 
       await new Promise<void>((resolve, reject) => {
         signAndExecuteTransaction(

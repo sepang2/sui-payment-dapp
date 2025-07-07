@@ -4,10 +4,9 @@ import React from "react";
 
 interface PaymentConfirmationProps {
   amount: string;
-  merchantName: string;
-  merchantAddress: string;
+  name: string;
   balance: number;
-  walletAddress?: string;
+  walletAddress: string;
   isProcessing: boolean;
   onCancel: () => void;
   onConfirm: () => void;
@@ -15,8 +14,7 @@ interface PaymentConfirmationProps {
 
 const PaymentConfirmation: React.FC<PaymentConfirmationProps> = ({
   amount,
-  merchantName,
-  merchantAddress,
+  name,
   balance,
   walletAddress,
   isProcessing,
@@ -34,7 +32,7 @@ const PaymentConfirmation: React.FC<PaymentConfirmationProps> = ({
       <div className="flex-1 flex flex-col justify-center px-6">
         {/* 상점명과 금액 */}
         <div className="text-center mb-8 p-4">
-          <h1 className="text-xl font-medium text-gray-800 dark:text-white mb-4">{merchantName}에서</h1>
+          <h1 className="text-xl font-medium text-gray-800 dark:text-white mb-4">{name}에서</h1>
           <p className="text-4xl font-bold text-gray-900 dark:text-white mb-2 p-2">{originalAmount.toFixed(3)} SUI</p>
           <p className="text-xl text-gray-800 dark:text-white">결제할까요?</p>
         </div>
@@ -85,7 +83,7 @@ const PaymentConfirmation: React.FC<PaymentConfirmationProps> = ({
             <div className="flex justify-between py-2">
               <p className="text-gray-700 dark:text-gray-300">받는 지갑</p>
               <p className="text-gray-900 dark:text-white">
-                {merchantAddress ? `${merchantAddress.slice(0, 6)}...${merchantAddress.slice(-4)}` : "N/A"}
+                {walletAddress ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}` : "N/A"}
               </p>
             </div>
           </div>

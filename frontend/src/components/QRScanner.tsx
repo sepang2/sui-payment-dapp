@@ -12,18 +12,18 @@ const QRScanner: React.FC<QRScannerProps> = ({ onCancel, onScanSuccess }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const qrScannerRef = useRef<QrScanner | null>(null);
 
-  // 카메라 권한 확인 함수
-  const checkCameraPermission = async () => {
-    try {
-      const permissionStatus = await navigator.permissions.query({
-        name: "camera" as PermissionName,
-      });
-      return permissionStatus.state;
-    } catch (err) {
-      console.error("Error checking camera permission: ", err);
-      return "prompt";
-    }
-  };
+  // // 카메라 권한 확인 함수
+  // const checkCameraPermission = async () => {
+  //   try {
+  //     const permissionStatus = await navigator.permissions.query({
+  //       name: "camera" as PermissionName,
+  //     });
+  //     return permissionStatus.state;
+  //   } catch (err) {
+  //     console.error("Error checking camera permission: ", err);
+  //     return "prompt";
+  //   }
+  // };
 
   const startCamera = async () => {
     try {
@@ -154,9 +154,8 @@ const QRScanner: React.FC<QRScannerProps> = ({ onCancel, onScanSuccess }) => {
             onClick={() => {
               // 테스트용 JSON 데이터로 QR 스캔 성공 시뮬레이션
               const testQRData = JSON.stringify({
-                merchantName: "테스트 상점",
-                merchantAddress: "0xTest",
-                lumaLink: "https://luma.com/event/test123",
+                name: "테스트 상점",
+                walletAddress: "0xTest123456789abcdef",
               });
               onScanSuccess(testQRData);
             }}

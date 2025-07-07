@@ -5,7 +5,7 @@ import Keypad from "./Keypad";
 
 interface AmountInputProps {
   amount: string;
-  merchantName: string;
+  name: string;
   balance: number;
   onKeypadPress: (key: string) => void;
   onCancel: () => void;
@@ -14,7 +14,7 @@ interface AmountInputProps {
 
 const AmountInput: React.FC<AmountInputProps> = ({
   amount,
-  merchantName,
+  name,
   balance,
   onKeypadPress,
   onCancel,
@@ -35,7 +35,7 @@ const AmountInput: React.FC<AmountInputProps> = ({
 
         {/* 메시지 */}
         <div className="text-center mb-8 p-4">
-          <h1 className="text-xl font-medium text-gray-800 dark:text-white mb-2">{merchantName}에서</h1>
+          <h1 className="text-xl font-medium text-gray-800 dark:text-white mb-2">{name}에서</h1>
           <h2 className="text-xl font-medium text-gray-800 dark:text-white">얼마를 결제할까요?</h2>
         </div>
 

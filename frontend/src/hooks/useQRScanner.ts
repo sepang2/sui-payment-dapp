@@ -3,9 +3,8 @@
 import { useState, useCallback } from "react";
 
 export interface QRScanResult {
-  merchantAddress: string;
-  merchantName?: string;
-  lumaLink?: string;
+  walletAddress: string;
+  name: string;
 }
 
 export function useQRScanner() {
@@ -29,8 +28,8 @@ export function useQRScanner() {
       const parsedResult = JSON.parse(result) as QRScanResult;
 
       // 기본 유효성 검사
-      if (!parsedResult.merchantAddress) {
-        throw new Error("Invalid QR code: merchant address not found");
+      if (!parsedResult.walletAddress) {
+        throw new Error("Invalid QR code: wallet address not found");
       }
 
       setScanResult(parsedResult);
@@ -40,8 +39,8 @@ export function useQRScanner() {
       // 단순 주소 문자열인 경우 처리
       if (result.startsWith("0x") && result.length === 66) {
         setScanResult({
-          merchantAddress: result,
-          merchantName: "Unknown Merchant",
+          walletAddress: result,
+          name: "Unknown User",
         });
         setIsScanning(false);
         setError("");
