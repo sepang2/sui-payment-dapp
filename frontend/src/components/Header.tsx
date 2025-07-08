@@ -145,9 +145,6 @@ const Header: React.FC<HeaderProps> = ({ walletConnected, walletAddress }) => {
                             <i className={`fas ${copySuccess ? "fa-check" : "fa-copy"} text-xs`}></i>
                           </button>
                         </div>
-                        {copySuccess && (
-                          <div className="text-xs text-green-600 dark:text-green-400 mt-1">주소가 복사되었습니다!</div>
-                        )}
                       </div>
                       <button
                         onClick={handleDisconnect}

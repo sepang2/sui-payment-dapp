@@ -21,6 +21,10 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({ visible }) => {
     router.push("/explore");
   };
 
+  const handleProfileClick = () => {
+    router.push("/profile");
+  };
+
   const isActive = (path: string) => {
     return pathname === path;
   };
@@ -51,9 +55,14 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({ visible }) => {
             <i className="fas fa-compass text-xl"></i>
             <span className="text-xs mt-1">탐색</span>
           </button>
-          <button className="py-3 px-4 flex flex-col items-center text-gray-500 dark:text-gray-400 cursor-pointer whitespace-nowrap">
-            <i className="fas fa-cog text-xl"></i>
-            <span className="text-xs mt-1">설정</span>
+          <button 
+            onClick={handleProfileClick}
+            className={`py-3 px-4 flex flex-col items-center cursor-pointer whitespace-nowrap ${
+              isActive("/profile") ? "text-indigo-600 dark:text-indigo-400" : "text-gray-500 dark:text-gray-400"
+            }`}
+          >
+            <i className="fas fa-user text-xl"></i>
+            <span className="text-xs mt-1">정보</span>
           </button>
         </div>
       </div>
