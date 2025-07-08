@@ -19,7 +19,7 @@ export function Providers({ children }: ProvidersProps) {
   return (
     <QueryClientProvider client={queryClient}>
       <SuiClientProvider networks={networkConfig} defaultNetwork="testnet">
-        <WalletProvider>
+        <WalletProvider autoConnect>
           <DarkModeProvider>
             <ThemeWrapper>{children}</ThemeWrapper>
           </DarkModeProvider>

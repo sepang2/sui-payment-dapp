@@ -33,9 +33,20 @@ const PaymentApp: React.FC = () => {
   const [amount, setAmount] = useState<string>("0");
   const [name, setName] = useState<string>("");
   const [walletAddress, setWalletAddress] = useState<string>("");
+  const [isInitializing, setIsInitializing] = useState<boolean>(true);
 
   const walletConnected = !!account;
   const walletBalance = balance;
+
+  // 앱 초기화 상태 관리
+  useEffect(() => {
+    // 지갑 연결 상태가 결정되면 초기화 완료
+    const timer = setTimeout(() => {
+      setIsInitializing(false);
+    }, 200);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   // 지갑 연결 상태 변화 감지 및 사용자 정보 확인
   useEffect(() => {
@@ -182,8 +193,18 @@ const PaymentApp: React.FC = () => {
 
       {/* 메인 콘텐츠 */}
       <main className="pb-20">
+        {/* 지갑 연결 상태 확인 중 */}
+        {isInitializing && (
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              <p className="text-gray-600 dark:text-gray-400">지갑 연결을 확인하는 중...</p>
+            </div>
+          </div>
+        )}
+
         {/* 사용자 정보 로딩 중 */}
-        {userLoading && walletConnected && (
+        {userLoading && walletConnected && !isInitializing && (
           <div className="flex items-center justify-center h-64">
             <div className="text-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
@@ -192,8 +213,30 @@ const PaymentApp: React.FC = () => {
           </div>
         )}
 
+        {/* 사용자 등록 화면 */}
+        {showRegistration && (
+          <UserRegistration
+            walletAddress={account?.address || ""}
+            onRegistrationComplete={handleRegistrationComplete}
+            onCancel={handleRegistrationCancel}
+          />
+        )}
+
+        {/* QR 코드 표시 */}
+        {showQRCode && user && (
+          <QRCodeDisplay
+            user={{
+              name: user.name,
+              description: user.description || undefined,
+              walletAddress: user.walletAddress,
+              qrCode: user.qrCode || undefined,
+            }}
+            onClose={closeQRCode}
+          />
+        )}
+
         {/* 대시보드 */}
-        {shouldShowMainContent && (
+        {shouldShowMainContent && !isInitializing && (
           <Dashboard
             walletConnected={walletConnected}
             balance={displayBalance}
@@ -204,7 +247,7 @@ const PaymentApp: React.FC = () => {
         )}
 
         {/* 지갑 연결되지 않은 경우 */}
-        {!walletConnected && (
+        {!walletConnected && !isInitializing && (
           <Dashboard
             walletConnected={false}
             balance={0}
@@ -234,17 +277,17 @@ const PaymentApp: React.FC = () => {
           <PaymentConfirmation
             amount={amount}
             name={name}
+            balance={displayBalance}
             senderWalletAddress={account?.address || ""}
             receiverWalletAddress={walletAddress}
-            balance={displayBalance}
-            isProcessing={isProcessing}
             onCancel={cancelPayment}
             onConfirm={confirmPayment}
+            isProcessing={isProcessing}
           />
         )}
 
         {/* 결제 성공 화면 */}
-        {paymentSuccess && <PaymentSuccess amount={amount} name={name}/>}
+        {paymentSuccess && <PaymentSuccess amount={amount} name={name} />}
       </main>
 
       {/* 하단 네비게이션 */}
@@ -258,28 +301,6 @@ const PaymentApp: React.FC = () => {
           !showQRCode
         }
       />
-
-      {/* 신규 가입자 등록 화면 */}
-      {showRegistration && account?.address && (
-        <UserRegistration
-          walletAddress={account.address}
-          onRegistrationComplete={handleRegistrationComplete}
-          onCancel={handleRegistrationCancel}
-        />
-      )}
-
-      {/* QR 코드 표시 화면 */}
-      {showQRCode && user && (
-        <QRCodeDisplay
-          user={{
-            name: user.name,
-            description: user.description || undefined,
-            walletAddress: user.walletAddress,
-            qrCode: user.qrCode || undefined,
-          }}
-          onClose={closeQRCode}
-        />
-      )}
     </div>
   );
 };
