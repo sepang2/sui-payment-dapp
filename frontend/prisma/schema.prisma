@@ -26,3 +26,16 @@ model User {
 
   @@map("users")
 }
+
+// 거래내역
+model Transaction {
+  id          String   @id @default(cuid())
+  fromAddress String // 송금자 지갑 주소
+  toAddress   String // 수신자 지갑 주소
+  amount      Decimal  @db.Decimal(20, 9) // 거래 금액 (SUI 단위)
+  txHash      String?  @unique // 트랜잭션 해시
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("transactions")
+}
