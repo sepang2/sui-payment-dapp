@@ -25,6 +25,10 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({ visible }) => {
     router.push("/profile");
   };
 
+  const handleTransactionsClick = () => {
+    router.push("/transactions");
+  };
+
   const isActive = (path: string) => {
     return pathname === path;
   };
@@ -42,7 +46,12 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({ visible }) => {
             <i className="fas fa-home text-xl"></i>
             <span className="text-xs mt-1">홈</span>
           </button>
-          <button className="py-3 px-4 flex flex-col items-center text-gray-500 dark:text-gray-400 cursor-pointer whitespace-nowrap">
+          <button 
+            onClick={handleTransactionsClick}
+            className={`py-3 px-4 flex flex-col items-center cursor-pointer whitespace-nowrap ${
+              isActive("/transactions") ? "text-indigo-600 dark:text-indigo-400" : "text-gray-500 dark:text-gray-400"
+            }`}
+          >
             <i className="fas fa-exchange-alt text-xl"></i>
             <span className="text-xs mt-1">거래</span>
           </button>
