@@ -13,7 +13,7 @@ interface Transaction {
   fromAddress?: string;
   description: string;
   timestamp: string;
-  status: "completed" | "pending" | "failed";
+  txHash: string;
 }
 
 // 더미 데이터
@@ -25,7 +25,7 @@ const dummyTransactions: Transaction[] = [
     toAddress: "0x8f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a",
     description: "카페 라떼",
     timestamp: "2025-01-07 09:30",
-    status: "completed",
+    txHash: "EKpob2HV2TSGhfv6gLYcvMC5RcTS9KxSxndoToiN5yN8",
   },
   {
     id: "2",
@@ -34,7 +34,7 @@ const dummyTransactions: Transaction[] = [
     toAddress: "0x7e9f8g0h1i2j3k4l5m6n7o8p9q0r1s2t3u4v5w6x7y8z9a0b1c2d3e4f5g6h7i8j",
     description: "아이스 아메리카노",
     timestamp: "2025-01-06 19:45",
-    status: "completed",
+    txHash: "owSgWNK5tPSvjeG4NEG6fPC6Yz8ddUBwqbFG1U6LP89",
   },
 ];
 
@@ -45,10 +45,7 @@ export default function TransactionsPage() {
 
   const walletConnected = !!account;
 
-  const getTransactionIcon = (type: string, status: string) => {
-    if (status === "pending") return "fas fa-clock text-yellow-500";
-    if (status === "failed") return "fas fa-times text-red-500";
-
+  const getTransactionIcon = (type: string) => {
     if (type === "send") return "fas fa-arrow-up text-red-500";
     return "fas fa-arrow-down text-green-500";
   };
@@ -91,7 +88,7 @@ export default function TransactionsPage() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
                     <div className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center mr-3">
-                      <i className={getTransactionIcon(transaction.type, transaction.status)}></i>
+                      <i className={getTransactionIcon(transaction.type)}></i>
                     </div>
                     <div className="flex-1">
                       <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">
@@ -105,21 +102,16 @@ export default function TransactionsPage() {
                         {transaction.type === "receive" && transaction.fromAddress && (
                           <p>보낸 주소: {formatAddress(transaction.fromAddress)}</p>
                         )}
-                        <div className="flex items-center gap-2">
-                          <span
-                            className={`inline-block px-2 py-1 text-xs rounded-full ${
-                              transaction.status === "completed"
-                                ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
-                                : transaction.status === "pending"
-                                ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400"
-                                : "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"
-                            }`}
+                        <p>
+                          <a
+                            href={`https://suiscan.xyz/testnet/tx/${transaction.txHash}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 hover:underline"
                           >
-                            {transaction.status === "completed" && "완료"}
-                            {transaction.status === "pending" && "대기중"}
-                            {transaction.status === "failed" && "실패"}
-                          </span>
-                        </div>
+                            트랜잭션 해시: {formatAddress(transaction.txHash)}
+                          </a>
+                        </p>
                       </div>
                     </div>
                   </div>
