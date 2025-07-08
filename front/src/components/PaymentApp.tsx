@@ -37,6 +37,7 @@ const PaymetApp: React.FC = () => {
   const [merchantName, setMerchantName] = useState<string>("");
   const [merchantAddress, setMerchantAddress] = useState<string>("");
   const [lumaLink, setLumaLink] = useState<string>("");
+  console.log(lumaLink);
 
   const walletConnected = !!account;
   const walletBalance = balance;
