@@ -47,7 +47,7 @@ export default function TransactionsPage() {
 
   const getTransactionIcon = (type: string, status: string) => {
     if (status === "pending") return "fas fa-clock text-yellow-500";
-    if (status === "failed") return "fas fa-times-circle text-red-500";
+    if (status === "failed") return "fas fa-times text-red-500";
 
     if (type === "send") return "fas fa-arrow-up text-red-500";
     return "fas fa-arrow-down text-green-500";
