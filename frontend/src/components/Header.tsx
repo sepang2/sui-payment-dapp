@@ -90,7 +90,7 @@ const Header: React.FC<HeaderProps> = ({ walletConnected, walletAddress }) => {
   return (
     <header className="bg-white dark:bg-gray-800 shadow-sm">
       <div className="flex justify-center">
-        <div className="w-full max-w-md px-6 py-3 flex justify-between items-center relative">
+        <div className="w-full max-w-md px-2 py-3 flex justify-between items-center relative">
           <div className="flex items-center">
             <h1 className="text-xl font-bold text-gray-800 dark:text-white pl-2">DSRV x Sui</h1>
           </div>
@@ -145,9 +145,6 @@ const Header: React.FC<HeaderProps> = ({ walletConnected, walletAddress }) => {
                             <i className={`fas ${copySuccess ? "fa-check" : "fa-copy"} text-xs`}></i>
                           </button>
                         </div>
-                        {copySuccess && (
-                          <div className="text-xs text-green-600 dark:text-green-400 mt-1">주소가 복사되었습니다!</div>
-                        )}
                       </div>
                       <button
                         onClick={handleDisconnect}

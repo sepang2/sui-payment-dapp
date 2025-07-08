@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { DISCOUNT_RATE, EXCHANGE_RATE } from "../utils/constants";
 
 interface PaymentConfirmationProps {
   amount: string;
@@ -24,8 +25,7 @@ const PaymentConfirmation: React.FC<PaymentConfirmationProps> = ({
   onConfirm,
 }) => {
   const originalAmount = parseFloat(amount);
-  const discountRate = 0.05;
-  const discountAmount = originalAmount * discountRate; // 5% 할인 가정
+  const discountAmount = originalAmount * DISCOUNT_RATE;
   const finalAmount = originalAmount - discountAmount;
 
   return (
@@ -47,7 +47,7 @@ const PaymentConfirmation: React.FC<PaymentConfirmationProps> = ({
               <p className="text-gray-900 dark:text-white">{originalAmount.toFixed(3)} SUI</p>
             </div>
             <div className="flex justify-between text-indigo-600 dark:text-indigo-400 py-4">
-              <p>할인 ({discountRate * 100}%)</p>
+              <p>할인 ({DISCOUNT_RATE * 100}%)</p>
               <p>-{discountAmount.toFixed(3)} SUI</p>
             </div>
             <div className="border-t border-gray-200 dark:border-gray-600 my-3 pb-4"></div>
@@ -55,7 +55,7 @@ const PaymentConfirmation: React.FC<PaymentConfirmationProps> = ({
               <p className="text-lg font-bold text-gray-900 dark:text-white">총 결제 금액</p>
               <div className="flex flex-col items-end">
                 <p className="text-lg font-bold text-gray-900 dark:text-white">{finalAmount.toFixed(3)} SUI</p>
-                <p className="text-gray-900 dark:text-white text-sm">≈ {(finalAmount * 3500).toLocaleString()} 원</p>
+                <p className="text-gray-900 dark:text-white text-sm">≈ {(finalAmount * EXCHANGE_RATE).toLocaleString()} 원</p>
               </div>
             </div>
           </div>
@@ -85,7 +85,9 @@ const PaymentConfirmation: React.FC<PaymentConfirmationProps> = ({
             <div className="flex justify-between py-2">
               <p className="text-gray-700 dark:text-gray-300">받는 지갑</p>
               <p className="text-gray-900 dark:text-white">
-                {receiverWalletAddress ? `${receiverWalletAddress.slice(0, 6)}...${receiverWalletAddress.slice(-4)}` : "N/A"}
+                {receiverWalletAddress
+                  ? `${receiverWalletAddress.slice(0, 6)}...${receiverWalletAddress.slice(-4)}`
+                  : "N/A"}
               </p>
             </div>
           </div>

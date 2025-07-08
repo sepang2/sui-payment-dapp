@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
     "db:generate": "prisma generate",
@@ -22,6 +22,7 @@
     "@radix-ui/themes": "^3.2.1",
     "@tanstack/react-query": "^5.81.5",
     "@types/qrcode": "^1.5.5",
+    "cheerio": "^1.1.0",
     "next": "15.3.5",
     "prisma": "^6.11.1",
     "qr-scanner": "^1.4.2",
@@ -32,6 +33,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
+    "@types/cheerio": "^1.0.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
