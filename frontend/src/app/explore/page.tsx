@@ -87,7 +87,7 @@ export default function ExplorePage() {
     return (
       <div className="h-screen bg-gray-50 dark:bg-gray-900">
         <Header walletConnected={walletConnected} walletAddress={account?.address} />
-        <div className="flex items-center justify-center h-full">
+        <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
         </div>
         <BottomNavigation visible={true} />
@@ -99,7 +99,7 @@ export default function ExplorePage() {
     return (
       <div className="h-screen bg-gray-50 dark:bg-gray-900">
         <Header walletConnected={walletConnected} walletAddress={account?.address} />
-        <div className="flex items-center justify-center h-full">
+        <div className="flex items-center justify-center h-64">
           <div className="text-red-500 dark:text-red-400">Error: {error}</div>
         </div>
         <BottomNavigation visible={true} />
