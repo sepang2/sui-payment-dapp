@@ -111,7 +111,7 @@ export default function ExplorePage() {
     <div className="h-screen bg-gray-50 dark:bg-gray-900">
       <Header walletConnected={walletConnected} walletAddress={account?.address} />
       <div className="px-4 py-6 pb-24 max-w-md mx-auto">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Partners' Events</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">이벤트 탐색</h1>
         {lumaLinks.length === 0 ? (
           <div className="text-center py-12">
             <i className="fas fa-search text-4xl text-gray-400 dark:text-gray-500 mb-4"></i>
