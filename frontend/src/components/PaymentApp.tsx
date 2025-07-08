@@ -178,7 +178,34 @@ const PaymentApp: React.FC = () => {
 
   const handleRegistrationCancel = () => {
     setShowRegistration(false);
-    // 필요한 경우 지갑 연결 해제 로직 추가 가능
+
+    // 지갑 연결 해제 로직 (Header.tsx의 handleDisconnect와 동일)
+    try {
+      // localStorage에서 SUI 지갑 관련 정보를 정리
+      const keysToRemove = [
+        "sui-dapp-kit:wallet-connection-info",
+        "sui-dapp-kit:last-wallet",
+        "walletconnect",
+        "sui_wallet",
+        "sui-wallet-adapter",
+        "wallet-standard:app",
+        "wallet-standard:wallet",
+      ];
+
+      // 모든 관련 localStorage 키 제거
+      keysToRemove.forEach((key) => {
+        localStorage.removeItem(key);
+      });
+
+      // sessionStorage도 정리
+      sessionStorage.clear();
+
+      window.location.reload();
+    } catch (error) {
+      console.error("Error during disconnect:", error);
+      // 에러 발생시에도 페이지 새로고침으로 fallback
+      window.location.reload();
+    }
   };
 
   const displayBalance = balanceLoading ? 0 : walletBalance;
