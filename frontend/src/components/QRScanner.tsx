@@ -13,21 +13,35 @@ const QRScanner: React.FC<QRScannerProps> = ({ onCancel, onScanSuccess }) => {
   const qrScannerRef = useRef<QrScanner | null>(null);
   const [error, setError] = useState<string>("");
 
+  // 카메라 및 스캐너 정지
+  const stopCamera = useCallback(() => {
+    if (videoRef.current && videoRef.current.srcObject) {
+      const stream = videoRef.current.srcObject as MediaStream;
+      const tracks = stream.getTracks();
+      tracks.forEach((track) => track.stop());
+      videoRef.current.srcObject = null;
+    }
+    if (qrScannerRef.current) {
+      qrScannerRef.current.stop();
+      qrScannerRef.current = null;
+    }
+  }, []);
+
   // 카메라 권한 확인 함수
-  const checkCameraPermission = async () => {
+  const checkCameraPermission = useCallback(async () => {
     try {
       const permissionStatus = await navigator.permissions.query({
         name: "camera" as PermissionName,
       });
-      return permissionStatus.state; // 'granted', 'denied', or 'prompt'
+      return permissionStatus.state;
     } catch (err) {
       console.error("Error checking camera permission: ", err);
       return "prompt"; // 만약 권한을 확인할 수 없으면 기본적으로 권한 요청을 진행
     }
-  };
+  }, []);
 
   // 카메라를 활성화하고 QR 스캐너 시작
-  const activateCamera = async () => {
+  const activateCamera = useCallback(async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
@@ -39,20 +53,22 @@ const QRScanner: React.FC<QRScannerProps> = ({ onCancel, onScanSuccess }) => {
       });
 
       if (videoRef.current) {
+        // 기존 스트림이 있다면 정리
+        if (videoRef.current.srcObject) {
+          const oldStream = videoRef.current.srcObject as MediaStream;
+          oldStream.getTracks().forEach((track) => track.stop());
+        }
+
         videoRef.current.srcObject = stream;
         videoRef.current.play();
 
         qrScannerRef.current = new QrScanner(
           videoRef.current,
           (result) => {
+            stopCamera();
             onScanSuccess(result.data);
           },
           {
-            onDecodeError: (error) => {
-              if (error !== "No QR code found") {
-                console.error("QR Scanner error: ", error);
-              }
-            },
             returnDetailedScanResult: true,
           }
         );
@@ -63,10 +79,10 @@ const QRScanner: React.FC<QRScannerProps> = ({ onCancel, onScanSuccess }) => {
       console.error("Error accessing camera: ", err);
       setError("카메라 접근이 거부되었습니다. 카메라 접근을 허용하고 다시 시도해주세요.");
     }
-  };
+  }, [stopCamera, onScanSuccess]);
 
   // 카메라 시작 함수
-  const startCamera = async () => {
+  const startCamera = useCallback(async () => {
     const cameraPermission = localStorage.getItem("cameraPermission");
 
     // 이미 허용된 경우
@@ -100,23 +116,12 @@ const QRScanner: React.FC<QRScannerProps> = ({ onCancel, onScanSuccess }) => {
     } else {
       setError("카메라 접근이 차단되었습니다. 설정에서 카메라 권한을 허용해주세요.");
     }
-  };
-
-  // 카메라 및 스캐너 정지
-  const stopCamera = () => {
-    if (videoRef.current && videoRef.current.srcObject) {
-      const stream = videoRef.current.srcObject as MediaStream;
-      const tracks = stream.getTracks();
-      tracks.forEach((track) => track.stop());
-      videoRef.current.srcObject = null;
-      qrScannerRef.current?.stop();
-    }
-  };
+  }, [activateCamera, checkCameraPermission]);
 
   const handleCancel = useCallback(() => {
     stopCamera();
     onCancel();
-  }, [onCancel]);
+  }, [onCancel, stopCamera]);
 
   useEffect(() => {
     startCamera();
@@ -173,6 +178,7 @@ const QRScanner: React.FC<QRScannerProps> = ({ onCancel, onScanSuccess }) => {
                 name: "테스트 상점",
                 walletAddress: "0x1234567890abcdef1234567890abcdef12345678",
               });
+              stopCamera(); // 테스트 버튼 클릭 시 카메라 종료
               onScanSuccess(testQRData);
             }}
             className="mt-8 bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-6 rounded-button font-semibold cursor-pointer shadow-lg"
