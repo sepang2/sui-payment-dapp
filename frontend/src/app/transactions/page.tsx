@@ -20,9 +20,10 @@ interface Transaction {
 const dummyTransactions: Transaction[] = [
   {
     id: "1",
-    type: "send",
+    type: "receive",
     amount: 0.45,
     toAddress: "0x8f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a",
+    fromAddress: "0x7e9f8g0h1i2j3k4l5m6n7o8p9q0r1s2t3u4v5w6x7y8z9a0b1c2d3e4f5g6h7i8j",
     description: "카페 라떼",
     timestamp: "2025-01-07 09:30",
     txHash: "EKpob2HV2TSGhfv6gLYcvMC5RcTS9KxSxndoToiN5yN8",
@@ -32,6 +33,7 @@ const dummyTransactions: Transaction[] = [
     type: "send",
     amount: 0.35,
     toAddress: "0x7e9f8g0h1i2j3k4l5m6n7o8p9q0r1s2t3u4v5w6x7y8z9a0b1c2d3e4f5g6h7i8j",
+    fromAddress: "0x8f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a",
     description: "아이스 아메리카노",
     timestamp: "2025-01-06 19:45",
     txHash: "owSgWNK5tPSvjeG4NEG6fPC6Yz8ddUBwqbFG1U6LP89",
@@ -97,10 +99,10 @@ export default function TransactionsPage() {
                       <div className="text-xs text-gray-500 dark:text-gray-400 space-y-1">
                         <p>{transaction.timestamp}</p>
                         {transaction.type === "send" && transaction.toAddress && (
-                          <p>받는 주소: {formatAddress(transaction.toAddress)}</p>
+                          <p>to: {formatAddress(transaction.toAddress)}</p>
                         )}
                         {transaction.type === "receive" && transaction.fromAddress && (
-                          <p>보낸 주소: {formatAddress(transaction.fromAddress)}</p>
+                          <p>from: {formatAddress(transaction.fromAddress)}</p>
                         )}
                         <p>
                           <a
