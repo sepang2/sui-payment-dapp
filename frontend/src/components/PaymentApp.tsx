@@ -16,6 +16,7 @@ import PaymentSuccess from "./PaymentSuccess";
 import BottomNavigation from "./BottomNavigation";
 import UserRegistration from "./UserRegistration";
 import QRCodeDisplay from "./QRCodeDisplay";
+import { DISCOUNT_RATE } from "../utils/constants";
 
 const PaymentApp: React.FC = () => {
   const account = useCurrentAccount();
@@ -138,8 +139,7 @@ const PaymentApp: React.FC = () => {
     if (!account || !walletAddress) return;
 
     const numericAmount = parseFloat(amount);
-    const discountRate = 0.05;
-    const discountAmount = numericAmount * discountRate;
+    const discountAmount = numericAmount * DISCOUNT_RATE;
     const finalAmount = numericAmount - discountAmount;
 
     const paymentRequest: PaymentRequest = {
