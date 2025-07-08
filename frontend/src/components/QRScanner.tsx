@@ -11,7 +11,6 @@ interface QRScannerProps {
 const QRScanner: React.FC<QRScannerProps> = ({ onCancel, onScanSuccess }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const qrScannerRef = useRef<QrScanner | null>(null);
-  const [scanning, setScanning] = useState(false);
   const [error, setError] = useState<string>("");
 
   // 카메라 권한 확인 함수
@@ -46,7 +45,6 @@ const QRScanner: React.FC<QRScannerProps> = ({ onCancel, onScanSuccess }) => {
         qrScannerRef.current = new QrScanner(
           videoRef.current,
           (result) => {
-            console.log("QR Scanner result:", result);
             onScanSuccess(result.data);
           },
           {
@@ -59,7 +57,6 @@ const QRScanner: React.FC<QRScannerProps> = ({ onCancel, onScanSuccess }) => {
           }
         );
         qrScannerRef.current.start();
-        setScanning(true);
         setError("");
       }
     } catch (err) {
@@ -113,7 +110,6 @@ const QRScanner: React.FC<QRScannerProps> = ({ onCancel, onScanSuccess }) => {
       tracks.forEach((track) => track.stop());
       videoRef.current.srcObject = null;
       qrScannerRef.current?.stop();
-      setScanning(false);
     }
   };
 
@@ -177,7 +173,6 @@ const QRScanner: React.FC<QRScannerProps> = ({ onCancel, onScanSuccess }) => {
                 name: "테스트 상점",
                 walletAddress: "0x1234567890abcdef1234567890abcdef12345678",
               });
-              console.log("Test QR data:", testQRData);
               onScanSuccess(testQRData);
             }}
             className="mt-8 bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-6 rounded-button font-semibold cursor-pointer shadow-lg"
