@@ -145,22 +145,7 @@ export default function SettingsPage() {
     }
   };
 
-  if (!walletConnected) {
-    return (
-      <div className="h-screen bg-gray-50 dark:bg-gray-900">
-        <Header walletConnected={false} />
-        <div className="flex items-center justify-center h-full">
-          <div className="text-center">
-            <i className="fas fa-wallet text-4xl text-gray-400 dark:text-gray-500 mb-4"></i>
-            <p className="text-gray-600 dark:text-gray-400">사용자 정보를 보려면 지갑을 연결해주세요.</p>
-          </div>
-        </div>
-        <BottomNavigation visible={true} />
-      </div>
-    );
-  }
-
-  if (loading) {
+  if (loading || !walletConnected) {
     return (
       <div className="h-screen bg-gray-50 dark:bg-gray-900">
         <Header walletConnected={walletConnected} walletAddress={account?.address} />
