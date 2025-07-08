@@ -206,7 +206,7 @@ export default function SettingsPage() {
                     type="text"
                     value={editForm.name}
                     onChange={(e) => handleInputChange("name", e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 text-black dark:text-white"
                     placeholder="이름을 입력하세요"
                   />
                 ) : (
@@ -224,7 +224,7 @@ export default function SettingsPage() {
                   <textarea
                     value={editForm.description}
                     onChange={(e) => handleInputChange("description", e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 text-black dark:text-white"
                     placeholder="자기소개를 입력하세요"
                     rows={3}
                   />
@@ -248,7 +248,7 @@ export default function SettingsPage() {
                     type="url"
                     value={editForm.lumaUrl}
                     onChange={(e) => handleInputChange("lumaUrl", e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 text-black dark:text-white"
                     placeholder="https://lu.ma/..."
                   />
                 ) : (
