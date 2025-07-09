@@ -76,10 +76,7 @@ const Header: React.FC<HeaderProps> = ({ walletConnected, walletAddress }) => {
       // 드롭다운 닫기
       setShowDisconnect(false);
 
-      // 약간의 지연 후 페이지 새로고침으로 완전한 연결 해제
-      setTimeout(() => {
-        window.location.reload();
-      }, 100);
+      window.location.reload();
     } catch (error) {
       console.error("Error during disconnect:", error);
       // 에러 발생시에도 페이지 새로고침으로 fallback

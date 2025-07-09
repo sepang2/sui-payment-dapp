@@ -29,7 +29,7 @@ const PaymentConfirmation: React.FC<PaymentConfirmationProps> = ({
   const finalAmount = originalAmount - discountAmount;
 
   return (
-    <div className="fixed inset-0 bg-white dark:bg-gray-900 flex flex-col">
+    <div className="fixed inset-0 bg-white dark:bg-gray-900 flex flex-col min-h-screen">
       {/* 중앙 콘텐츠 */}
       <div className="flex-1 flex flex-col justify-center px-6">
         {/* 상점명과 금액 */}
@@ -55,7 +55,9 @@ const PaymentConfirmation: React.FC<PaymentConfirmationProps> = ({
               <p className="text-lg font-bold text-gray-900 dark:text-white">총 결제 금액</p>
               <div className="flex flex-col items-end">
                 <p className="text-lg font-bold text-gray-900 dark:text-white">{finalAmount.toFixed(3)} SUI</p>
-                <p className="text-gray-900 dark:text-white text-sm">≈ {(finalAmount * EXCHANGE_RATE).toLocaleString()} 원</p>
+                <p className="text-gray-900 dark:text-white text-sm">
+                  ≈ {(finalAmount * EXCHANGE_RATE).toLocaleString()} 원
+                </p>
               </div>
             </div>
           </div>
@@ -95,11 +97,11 @@ const PaymentConfirmation: React.FC<PaymentConfirmationProps> = ({
       </div>
 
       {/* 하단 버튼들 */}
-      <div className="px-6 pb-6">
+      <div className="px-6 pb-8 pt-4" style={{ paddingBottom: "max(2rem, env(safe-area-inset-bottom))" }}>
         <div className="flex gap-3 w-full">
           <button
             onClick={onCancel}
-            className="flex-1 max-w-1/3 bg-gray-300 hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 py-4 rounded-lg font-semibold text-lg transition-colors"
+            className="flex-1 max-w-1/3 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-300 py-4 rounded-lg font-semibold text-lg transition-colors border border-gray-300 dark:border-gray-600"
           >
             그만할래요
           </button>

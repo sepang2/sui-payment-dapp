@@ -44,7 +44,7 @@ const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({ user, onClose }) => {
           {user.qrCode ? (
             <div className="space-y-4">
               {/* QR 코드 이미지 */}
-              <div className="bg-white p-4 rounded-lg shadow-inner mx-auto inline-block">
+              <div className="bg-white p-4 rounded-lg mx-auto inline-block">
                 <img src={user.qrCode} alt="QR Code" className="w-64 h-64 mx-auto" />
               </div>
 

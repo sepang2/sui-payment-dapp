@@ -149,7 +149,7 @@ export default function SettingsPage() {
     return (
       <div className="h-screen bg-gray-50 dark:bg-gray-900">
         <Header walletConnected={walletConnected} walletAddress={account?.address} />
-        <div className="flex items-center justify-center h-full">
+        <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
         </div>
         <BottomNavigation visible={true} />
@@ -161,7 +161,7 @@ export default function SettingsPage() {
     return (
       <div className="h-screen bg-gray-50 dark:bg-gray-900">
         <Header walletConnected={walletConnected} walletAddress={account?.address} />
-        <div className="flex items-center justify-center h-full">
+        <div className="flex items-center justify-center h-64">
           <div className="text-center">
             <i className="fas fa-exclamation-triangle text-4xl text-red-500 mb-4"></i>
             <p className="text-red-500 dark:text-red-400">사용자 정보를 불러오는데 실패했습니다.</p>
@@ -206,7 +206,7 @@ export default function SettingsPage() {
                     type="text"
                     value={editForm.name}
                     onChange={(e) => handleInputChange("name", e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 text-black dark:text-white"
                     placeholder="이름을 입력하세요"
                   />
                 ) : (
@@ -224,7 +224,7 @@ export default function SettingsPage() {
                   <textarea
                     value={editForm.description}
                     onChange={(e) => handleInputChange("description", e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 text-black dark:text-white"
                     placeholder="자기소개를 입력하세요"
                     rows={3}
                   />
@@ -248,7 +248,7 @@ export default function SettingsPage() {
                     type="url"
                     value={editForm.lumaUrl}
                     onChange={(e) => handleInputChange("lumaUrl", e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 text-black dark:text-white"
                     placeholder="https://lu.ma/..."
                   />
                 ) : (
