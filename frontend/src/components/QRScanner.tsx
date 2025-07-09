@@ -170,21 +170,6 @@ const QRScanner: React.FC<QRScannerProps> = ({ onCancel, onScanSuccess }) => {
               </div>
             )}
           </div>
-
-          {/* 테스트 버튼 */}
-          <button
-            onClick={() => {
-              const testQRData = JSON.stringify({
-                name: "테스트 상점",
-                walletAddress: "0x1234567890abcdef1234567890abcdef12345678",
-              });
-              stopCamera(); // 테스트 버튼 클릭 시 카메라 종료
-              onScanSuccess(testQRData);
-            }}
-            className="mt-8 bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-6 rounded-button font-semibold cursor-pointer shadow-lg"
-          >
-            QR 인식 성공 (테스트)
-          </button>
         </div>
 
         {/* 상단 안내 텍스트 */}

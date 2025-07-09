@@ -3,6 +3,7 @@ import { useRouter } from "next/navigation";
 import { useCurrentAccount } from "@mysten/dapp-kit";
 import { useUser } from "./useUser";
 import { UserType } from "../utils/constants";
+import { isNewPaymentFlowActive } from "../utils/paymentFlow";
 
 interface UseAuthOptions {
   requiredUserType?: UserType;
@@ -30,6 +31,11 @@ export const useAuth = (options: UseAuthOptions = {}): UseAuthReturn => {
   const isAuthorized = !requiredUserType || Boolean(user && user.userType === requiredUserType);
 
   useEffect(() => {
+    // 새로운 결제 플로우가 활성화되어 있으면 리다이렉트하지 않음
+    if (isNewPaymentFlowActive()) {
+      return;
+    }
+
     // 지갑이 연결되지 않은 경우
     if (!isAuthenticated) {
       if (redirectTo) {
