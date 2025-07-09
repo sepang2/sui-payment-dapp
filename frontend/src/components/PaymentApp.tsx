@@ -1,39 +1,26 @@
 "use client";
 
-// The exported code uses Tailwind CSS. Install Tailwind CSS in your dev environment to ensure all styles work.
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useCurrentAccount } from "@mysten/dapp-kit";
 import { useBalance } from "../hooks/useBalance";
-import { usePayment, PaymentRequest } from "../hooks/usePayment";
-import { useQRScanner } from "../hooks/useQRScanner";
 import { useUser } from "../hooks/useUser";
 import Header from "./Header";
 import Dashboard from "./Dashboard";
-import QRScanner from "./QRScanner";
-import AmountInput from "./AmountInput";
-import PaymentConfirmation from "./PaymentConfirmation";
-import PaymentSuccess from "./PaymentSuccess";
 import BottomNavigation from "./BottomNavigation";
 import UserRegistration from "./UserRegistration";
 import QRCodeDisplay from "./QRCodeDisplay";
-import { DISCOUNT_RATE } from "../utils/constants";
+import WalletConnectionPrompt from "./common/WalletConnectionPrompt";
+import { UserType } from "../utils/constants";
 
 const PaymentApp: React.FC = () => {
+  const router = useRouter();
   const account = useCurrentAccount();
-  const { balance, isPending: balanceLoading, refetch: refetchBalance } = useBalance();
-  const { processPayment, isProcessing } = usePayment();
-  const { scanResult, error: qrError, startScanning, stopScanning, handleScanResult, clearResult } = useQRScanner();
-  const { user, isNewUser, isLoading: userLoading, checkUser, clearUser } = useUser();
+  const { balance, isPending: balanceLoading } = useBalance();
+  const { user, isNewUser, isLoading: userLoading, clearUser } = useUser();
 
-  const [scanningQR, setScanningQR] = useState<boolean>(false);
-  const [enteringAmount, setEnteringAmount] = useState<boolean>(false);
-  const [confirmingPayment, setConfirmingPayment] = useState<boolean>(false);
-  const [paymentSuccess, setPaymentSuccess] = useState<boolean>(false);
   const [showRegistration, setShowRegistration] = useState<boolean>(false);
   const [showQRCode, setShowQRCode] = useState<boolean>(false);
-  const [amount, setAmount] = useState<string>("0");
-  const [name, setName] = useState<string>("");
-  const [walletAddress, setWalletAddress] = useState<string>("");
   const [isInitializing, setIsInitializing] = useState<boolean>(true);
 
   const walletConnected = !!account;
@@ -49,15 +36,12 @@ const PaymentApp: React.FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // 지갑 연결 상태 변화 감지 및 사용자 정보 확인
+  // 지갑 연결 상태 변화 감지
   useEffect(() => {
-    if (account?.address) {
-      checkUser(account.address);
-    } else {
-      clearUser();
+    if (!account?.address) {
       setShowRegistration(false);
     }
-  }, [account?.address, checkUser, clearUser]);
+  }, [account?.address]);
 
   // 신규 가입자인 경우 등록 화면 표시
   useEffect(() => {
@@ -66,10 +50,16 @@ const PaymentApp: React.FC = () => {
     }
   }, [walletConnected, isNewUser, userLoading]);
 
-  const startQRScan = () => {
-    setScanningQR(true);
-    startScanning();
-  };
+  // 등록된 사용자의 경우 타입에 따라 리다이렉트
+  useEffect(() => {
+    if (user && !userLoading && !showRegistration) {
+      if (user.userType === UserType.STORE) {
+        router.push("/store/home");
+      } else if (user.userType === UserType.CONSUMER) {
+        router.push("/consumer/home");
+      }
+    }
+  }, [user, userLoading, showRegistration, router]);
 
   const makeQRCode = () => {
     if (walletConnected && user) {
@@ -81,99 +71,9 @@ const PaymentApp: React.FC = () => {
     setShowQRCode(false);
   };
 
-  const handleQRScanSuccess = (result: string) => {
-    // QR 스캔 결과를 처리
-    handleScanResult(result);
-  };
-
-  // QR 스캔 결과 처리
-  useEffect(() => {
-    if (scanResult && !qrError) {
-      setScanningQR(false);
-      setEnteringAmount(true);
-      setName(scanResult.name || "Unknown User");
-      setWalletAddress(scanResult.walletAddress);
-      setAmount("0"); // 사용자가 직접 입력하도록 "0"으로 설정
-      clearResult();
-    }
-  }, [scanResult, qrError, clearResult]);
-
-  const cancelQRScan = () => {
-    setScanningQR(false);
-    stopScanning();
-    clearResult();
-  };
-
-  const handleKeypadPress = (key: string) => {
-    if (key === "backspace") {
-      setAmount((prev) => (prev.length > 1 ? prev.slice(0, -1) : "0"));
-    } else if (key === ".") {
-      setAmount((prev) => {
-        // 이미 소수점이 있으면 추가하지 않음
-        if (prev.includes(".")) return prev;
-        // "0"이면 "0."으로 시작
-        if (prev === "0") return "0.";
-        return prev + ".";
-      });
-    } else {
-      setAmount((prev) => {
-        // "0"인 경우에만 숫자로 교체 (소수점이 있는 경우는 제외)
-        if (prev === "0") return key;
-        return prev + key;
-      });
-    }
-  };
-
-  const proceedToConfirmation = () => {
-    setEnteringAmount(false);
-    setConfirmingPayment(true);
-  };
-
-  const cancelPayment = () => {
-    setEnteringAmount(false);
-    setConfirmingPayment(false);
-    setAmount("0");
-  };
-
-  const confirmPayment = async () => {
-    if (!account || !walletAddress) return;
-
-    const numericAmount = parseFloat(amount);
-    const discountAmount = numericAmount * DISCOUNT_RATE;
-    const finalAmount = numericAmount - discountAmount;
-
-    const paymentRequest: PaymentRequest = {
-      walletAddress,
-      amount: finalAmount,
-      name,
-      discountAmount,
-    };
-
-    try {
-      await processPayment(paymentRequest);
-      setConfirmingPayment(false);
-      setPaymentSuccess(true);
-
-      // 3초 후 초기 화면으로 돌아가기
-      setTimeout(() => {
-        setPaymentSuccess(false);
-        setAmount("0");
-        setName("");
-        setWalletAddress("");
-        refetchBalance();
-      }, 3000);
-    } catch (error) {
-      console.error("Payment failed:", error);
-      // 에러 처리 로직 추가 가능
-    }
-  };
-
   const handleRegistrationComplete = () => {
     setShowRegistration(false);
-    // 사용자 정보 다시 조회
-    if (account?.address) {
-      checkUser(account.address);
-    }
+    // 사용자 정보는 useUser 훅에서 자동으로 업데이트됨
   };
 
   const handleRegistrationCancel = () => {
@@ -265,69 +165,19 @@ const PaymentApp: React.FC = () => {
         {/* 대시보드 */}
         {shouldShowMainContent && !isInitializing && (
           <Dashboard
-            walletConnected={walletConnected}
             balance={displayBalance}
             balanceLoading={balanceLoading}
             onMakeQRCode={makeQRCode}
-            onScanQRCode={startQRScan}
+            onScanQRCode={() => {}} // Consumer 결제 플로우 제거로 빈 함수
           />
         )}
 
         {/* 지갑 연결되지 않은 경우 */}
-        {!walletConnected && !isInitializing && (
-          <Dashboard
-            walletConnected={false}
-            balance={0}
-            balanceLoading={false}
-            onMakeQRCode={makeQRCode}
-            onScanQRCode={startQRScan}
-          />
-        )}
-
-        {/* QR 코드 스캔 화면 */}
-        {scanningQR && <QRScanner onCancel={cancelQRScan} onScanSuccess={handleQRScanSuccess} />}
-
-        {/* 결제 금액 입력 화면 */}
-        {enteringAmount && (
-          <AmountInput
-            amount={amount}
-            name={name}
-            balance={displayBalance}
-            onKeypadPress={handleKeypadPress}
-            onCancel={cancelPayment}
-            onProceed={proceedToConfirmation}
-          />
-        )}
-
-        {/* 결제 확인 화면 */}
-        {confirmingPayment && (
-          <PaymentConfirmation
-            amount={amount}
-            name={name}
-            balance={displayBalance}
-            senderWalletAddress={account?.address || ""}
-            receiverWalletAddress={walletAddress}
-            onCancel={cancelPayment}
-            onConfirm={confirmPayment}
-            isProcessing={isProcessing}
-          />
-        )}
-
-        {/* 결제 성공 화면 */}
-        {paymentSuccess && <PaymentSuccess amount={amount} name={name} />}
+        {!walletConnected && !isInitializing && <WalletConnectionPrompt />}
       </main>
 
       {/* 하단 네비게이션 */}
-      <BottomNavigation
-        visible={
-          shouldShowMainContent &&
-          !scanningQR &&
-          !enteringAmount &&
-          !confirmingPayment &&
-          !paymentSuccess &&
-          !showQRCode
-        }
-      />
+      <BottomNavigation visible={shouldShowMainContent && !showQRCode} />
     </div>
   );
 };

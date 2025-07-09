@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import QRCode from "qrcode";
+import { UserType } from "../utils/constants";
 
 interface UserRegistrationProps {
   walletAddress: string;
@@ -10,10 +11,16 @@ interface UserRegistrationProps {
 }
 
 const UserRegistration: React.FC<UserRegistrationProps> = ({ walletAddress, onRegistrationComplete, onCancel }) => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    name: string;
+    description: string;
+    lumaUrl: string;
+    userType: UserType;
+  }>({
     name: "",
     description: "",
     lumaUrl: "",
+    userType: UserType.CONSUMER, // 기본값은 소비자
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -81,6 +88,13 @@ const UserRegistration: React.FC<UserRegistrationProps> = ({ walletAddress, onRe
     }
   };
 
+  const handleUserTypeChange = (userType: UserType) => {
+    setFormData((prev) => ({
+      ...prev,
+      userType,
+    }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -128,20 +142,49 @@ const UserRegistration: React.FC<UserRegistrationProps> = ({ walletAddress, onRe
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* 사용자 타입 선택 */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+              사용자 유형 <span className="text-red-500">*</span>
+            </label>
+            <div className="flex space-x-4">
+              <label className="flex items-center cursor-pointer">
+                <input
+                  type="radio"
+                  name="userType"
+                  checked={formData.userType === UserType.CONSUMER}
+                  onChange={() => handleUserTypeChange(UserType.CONSUMER)}
+                  className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                />
+                <span className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">소비자</span>
+              </label>
+              <label className="flex items-center cursor-pointer">
+                <input
+                  type="radio"
+                  name="userType"
+                  checked={formData.userType === UserType.STORE}
+                  onChange={() => handleUserTypeChange(UserType.STORE)}
+                  className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                />
+                <span className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">상점</span>
+              </label>
+            </div>
+          </div>
+
           {/* 사용자명 입력 */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              사용자명 <span className="text-red-500">*</span>
+              {formData.userType === UserType.STORE ? "상점명" : "사용자명"} <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
               name="name"
               value={formData.name}
               onChange={handleInputChange}
-              className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white ${
+              className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 text-black focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white ${
                 errors.name ? "border-red-500" : "border-gray-300"
               }`}
-              placeholder="사용자명을 입력하세요"
+              placeholder={formData.userType === UserType.STORE ? "상점명을 입력하세요" : "사용자명을 입력하세요"}
               maxLength={50}
             />
             {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
@@ -149,34 +192,42 @@ const UserRegistration: React.FC<UserRegistrationProps> = ({ walletAddress, onRe
 
           {/* 설명 입력 */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">사용자 설명</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              {formData.userType === UserType.STORE ? "상점 설명" : "사용자 설명"}
+            </label>
             <textarea
               name="description"
               value={formData.description}
               onChange={handleInputChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white resize-none"
-              placeholder="사용자에 대한 간단한 설명을 입력하세요"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 text-black focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white resize-none"
+              placeholder={
+                formData.userType === UserType.STORE
+                  ? "상점에 대한 간단한 설명을 입력하세요"
+                  : "사용자에 대한 간단한 설명을 입력하세요"
+              }
               rows={3}
               maxLength={200}
             />
             <p className="text-gray-500 text-xs mt-1">{formData.description.length}/200</p>
           </div>
 
-          {/* Luma URL 입력 */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Luma 이벤트 URL</label>
-            <input
-              type="url"
-              name="lumaUrl"
-              value={formData.lumaUrl}
-              onChange={handleInputChange}
-              className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white ${
-                errors.lumaUrl ? "border-red-500" : "border-gray-300"
-              }`}
-              placeholder="https://lu.ma/your-event"
-            />
-            {errors.lumaUrl && <p className="text-red-500 text-sm mt-1">{errors.lumaUrl}</p>}
-          </div>
+          {/* Luma URL 입력 - 상점인 경우에만 표시 */}
+          {formData.userType === UserType.STORE && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Luma 이벤트 URL</label>
+              <input
+                type="url"
+                name="lumaUrl"
+                value={formData.lumaUrl}
+                onChange={handleInputChange}
+                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 text-black focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white ${
+                  errors.lumaUrl ? "border-red-500" : "border-gray-300"
+                }`}
+                placeholder="https://lu.ma/your-event"
+              />
+              {errors.lumaUrl && <p className="text-red-500 text-sm mt-1">{errors.lumaUrl}</p>}
+            </div>
+          )}
 
           {/* 에러 메시지 */}
           {errors.submit && (

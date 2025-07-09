@@ -29,7 +29,7 @@ const PaymentConfirmation: React.FC<PaymentConfirmationProps> = ({
   const finalAmount = originalAmount - discountAmount;
 
   return (
-    <div className="fixed inset-0 bg-white dark:bg-gray-900 flex flex-col min-h-screen">
+    <div className="fixed inset-0 bg-white dark:bg-gray-900 flex flex-col">
       {/* 중앙 콘텐츠 */}
       <div className="flex-1 flex flex-col justify-center px-6">
         {/* 상점명과 금액 */}
@@ -97,7 +97,7 @@ const PaymentConfirmation: React.FC<PaymentConfirmationProps> = ({
       </div>
 
       {/* 하단 버튼들 */}
-      <div className="px-6 pb-8 pt-4" style={{ paddingBottom: "max(2rem, env(safe-area-inset-bottom))" }}>
+      <div className="px-6 pb-8 pt-4">
         <div className="flex gap-3 w-full">
           <button
             onClick={onCancel}
