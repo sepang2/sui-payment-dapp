@@ -9,21 +9,14 @@ import BottomNavigation from "../../components/BottomNavigation";
 
 export default function ProfileRedirectPage() {
   const account = useCurrentAccount();
-  const { user, isLoading, checkUser } = useUser();
+  const { user, isLoading } = useUser();
   const router = useRouter();
-
-  useEffect(() => {
-    if (account?.address) {
-      checkUser(account.address);
-    }
-  }, [account?.address, checkUser]);
 
   useEffect(() => {
     if (!isLoading && user && user.userType) {
       if (user.userType === "STORE") {
         router.push("/store/profile");
       } else if (user.userType === "CONSUMER") {
-        // 소비자는 profile 페이지가 없으므로 home으로 리다이렉트
         router.push("/consumer/home");
       }
     }

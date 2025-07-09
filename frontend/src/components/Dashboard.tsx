@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
-import { useCurrentAccount } from "@mysten/dapp-kit";
+import React from "react";
 import { useUser } from "../hooks/useUser";
 import { EXCHANGE_RATE } from "../utils/constants";
 import TransactionList from "./common/TransactionList";
@@ -14,16 +13,9 @@ interface DashboardProps {
 }
 
 const Dashboard: React.FC<DashboardProps> = ({ balance, balanceLoading, onMakeQRCode, onScanQRCode }) => {
-  const account = useCurrentAccount();
-  const { user, checkUser } = useUser();
+  const { user } = useUser();
   const exchangeRate = EXCHANGE_RATE;
   const displayBalance = balanceLoading ? 0 : balance;
-
-  useEffect(() => {
-    if (account?.address) {
-      checkUser(account.address);
-    }
-  }, [account?.address, checkUser]);
 
   return (
     <div className="flex justify-center">

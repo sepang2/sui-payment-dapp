@@ -25,7 +25,7 @@ const PaymentApp: React.FC = () => {
   const { balance, isPending: balanceLoading, refetch: refetchBalance } = useBalance();
   const { processPayment, isProcessing } = usePayment();
   const { scanResult, error: qrError, startScanning, stopScanning, handleScanResult, clearResult } = useQRScanner();
-  const { user, isNewUser, isLoading: userLoading, checkUser, clearUser } = useUser();
+  const { user, isNewUser, isLoading: userLoading } = useUser();
 
   const [scanningQR, setScanningQR] = useState<boolean>(false);
   const [enteringAmount, setEnteringAmount] = useState<boolean>(false);
@@ -51,15 +51,12 @@ const PaymentApp: React.FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // 지갑 연결 상태 변화 감지 및 사용자 정보 확인
+  // 지갑 연결 상태 변화 감지 (useUser 훅에서 자동으로 사용자 정보 확인)
   useEffect(() => {
-    if (account?.address) {
-      checkUser(account.address);
-    } else {
-      clearUser();
+    if (!account?.address) {
       setShowRegistration(false);
     }
-  }, [account?.address, checkUser, clearUser]);
+  }, [account?.address]);
 
   // 신규 가입자인 경우 등록 화면 표시
   useEffect(() => {
@@ -183,10 +180,7 @@ const PaymentApp: React.FC = () => {
 
   const handleRegistrationComplete = () => {
     setShowRegistration(false);
-    // 사용자 정보 다시 조회
-    if (account?.address) {
-      checkUser(account.address);
-    }
+    // 사용자 정보는 useUser 훅에서 자동으로 업데이트됨
   };
 
   const handleRegistrationCancel = () => {

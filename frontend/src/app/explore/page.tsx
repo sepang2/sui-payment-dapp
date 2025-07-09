@@ -9,21 +9,14 @@ import BottomNavigation from "../../components/BottomNavigation";
 
 export default function ExploreRedirectPage() {
   const account = useCurrentAccount();
-  const { user, isLoading, checkUser } = useUser();
+  const { user, isLoading } = useUser();
   const router = useRouter();
-
-  useEffect(() => {
-    if (account?.address) {
-      checkUser(account.address);
-    }
-  }, [account?.address, checkUser]);
 
   useEffect(() => {
     if (!isLoading && user && user.userType) {
       if (user.userType === "CONSUMER") {
         router.push("/consumer/explore");
       } else if (user.userType === "STORE") {
-        // 상점은 explore 페이지가 없으므로 home으로 리다이렉트
         router.push("/store/home");
       }
     }

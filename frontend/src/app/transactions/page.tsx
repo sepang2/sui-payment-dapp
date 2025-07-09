@@ -9,14 +9,8 @@ import BottomNavigation from "../../components/BottomNavigation";
 
 export default function TransactionsRedirectPage() {
   const account = useCurrentAccount();
-  const { user, isLoading, checkUser } = useUser();
+  const { user, isLoading } = useUser();
   const router = useRouter();
-
-  useEffect(() => {
-    if (account?.address) {
-      checkUser(account.address);
-    }
-  }, [account?.address, checkUser]);
 
   useEffect(() => {
     if (!isLoading && user && user.userType) {
