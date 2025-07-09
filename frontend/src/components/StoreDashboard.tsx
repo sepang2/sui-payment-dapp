@@ -88,10 +88,10 @@ const StoreDashboard: React.FC<StoreDashboardProps> = ({ user, onShowQRCode }) =
             <div className="text-center">
               <button
                 onClick={onShowQRCode}
-                className="hover:opacity-80 transition-opacity cursor-pointer p-4 rounded-lg border-2 border-gray-200 dark:border-gray-600 hover:border-indigo-300 dark:hover:border-indigo-500 bg-white"
+                className="hover:opacity-80 transition-opacity cursor-pointer p-2 rounded-lg border-2 border-gray-200 dark:border-gray-600 hover:border-indigo-300 dark:hover:border-indigo-500 bg-white"
                 title="QR 코드 크게 보기"
               >
-                <img src={user.qrCode} alt="결제 QR 코드" className="w-32 h-32 mx-auto rounded-md" />
+                <img src={user.qrCode} alt="결제 QR 코드" className="w-36 h-36 mx-auto rounded-md" />
               </button>
               <p className="text-sm text-gray-500 dark:text-gray-400 mt-3">
                 고객이 이 QR 코드를 스캔하여 결제할 수 있습니다
