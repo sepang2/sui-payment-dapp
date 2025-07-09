@@ -13,36 +13,53 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// 사용자 타입 enum
-enum UserType {
-  STORE
-  CONSUMER
-}
-
-// 사용자 정보
-model User {
-  id            String   @id @default(cuid())
-  name          String // 사용자명
-  description   String? // 사용자 설명
+// 소비자 정보
+model Customer {
+  id            Int      @id @default(autoincrement())
+  name          String? // 사용자명
   walletAddress String   @unique // 사용자 지갑 주소
-  userType      UserType @default(CONSUMER) // 사용자 타입 (상점/소비자)
-  qrCode        String?  @db.LongText // 지갑 주소 QR코드 (base64)
-  lumaUrl       String? // Luma 이벤트 URL
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  @@map("users")
+  transactions Transaction[] // 해당 소비자의 거래 내역
+
+  @@map("customers")
+}
+
+// 상점 정보
+model Store {
+  id            Int      @id @default(autoincrement())
+  name          String // 상점명
+  description   String? // 상점 설명
+  walletAddress String   @unique // 상점 지갑 주소
+  uniqueId      String   @unique // QR 코드에 사용될 고유 ID
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  transactions Transaction[] // 해당 상점의 거래 내역
+
+  @@map("stores")
 }
 
 // 거래내역
 model Transaction {
-  id          String   @id @default(cuid())
-  fromAddress String // 송금자 지갑 주소
-  toAddress   String // 수신자 지갑 주소
-  amount      Decimal  @db.Decimal(20, 9) // 거래 금액 (SUI 단위)
-  txHash      String?  @unique // 트랜잭션 해시
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id     Int     @id @default(autoincrement())
+  amount Decimal @db.Decimal(20, 9) // 거래 금액 (SUI 단위)
+  txHash String  @unique // 트랜잭션 해시
+
+  // 거래 관계 설정
+  customer   Customer @relation(fields: [customerId], references: [id])
+  customerId Int
+
+  store   Store @relation(fields: [storeId], references: [id])
+  storeId Int
+
+  // 편의를 위해 주소도 저장
+  fromAddress String // 송금자 지갑 주소 (Customer's wallet)
+  toAddress   String // 수신자 지갑 주소 (Store's wallet)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("transactions")
 }
