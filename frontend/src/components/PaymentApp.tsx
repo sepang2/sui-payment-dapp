@@ -1,7 +1,7 @@
 "use client";
 
-// The exported code uses Tailwind CSS. Install Tailwind CSS in your dev environment to ensure all styles work.
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useCurrentAccount } from "@mysten/dapp-kit";
 import { useBalance } from "../hooks/useBalance";
 import { usePayment, PaymentRequest } from "../hooks/usePayment";
@@ -16,9 +16,11 @@ import PaymentSuccess from "./PaymentSuccess";
 import BottomNavigation from "./BottomNavigation";
 import UserRegistration from "./UserRegistration";
 import QRCodeDisplay from "./QRCodeDisplay";
-import { DISCOUNT_RATE } from "../utils/constants";
+import WalletConnectionPrompt from "./common/WalletConnectionPrompt";
+import { DISCOUNT_RATE, UserType } from "../utils/constants";
 
 const PaymentApp: React.FC = () => {
+  const router = useRouter();
   const account = useCurrentAccount();
   const { balance, isPending: balanceLoading, refetch: refetchBalance } = useBalance();
   const { processPayment, isProcessing } = usePayment();
@@ -65,6 +67,17 @@ const PaymentApp: React.FC = () => {
       setShowRegistration(true);
     }
   }, [walletConnected, isNewUser, userLoading]);
+
+  // 등록된 사용자의 경우 타입에 따라 리다이렉트
+  useEffect(() => {
+    if (user && !userLoading && !showRegistration) {
+      if (user.userType === UserType.STORE) {
+        router.push("/store/home");
+      } else if (user.userType === UserType.CONSUMER) {
+        router.push("/consumer/home");
+      }
+    }
+  }, [user, userLoading, showRegistration, router]);
 
   const startQRScan = () => {
     setScanningQR(true);
@@ -265,7 +278,6 @@ const PaymentApp: React.FC = () => {
         {/* 대시보드 */}
         {shouldShowMainContent && !isInitializing && (
           <Dashboard
-            walletConnected={walletConnected}
             balance={displayBalance}
             balanceLoading={balanceLoading}
             onMakeQRCode={makeQRCode}
@@ -274,15 +286,7 @@ const PaymentApp: React.FC = () => {
         )}
 
         {/* 지갑 연결되지 않은 경우 */}
-        {!walletConnected && !isInitializing && (
-          <Dashboard
-            walletConnected={false}
-            balance={0}
-            balanceLoading={false}
-            onMakeQRCode={makeQRCode}
-            onScanQRCode={startQRScan}
-          />
-        )}
+        {!walletConnected && !isInitializing && <WalletConnectionPrompt />}
 
         {/* QR 코드 스캔 화면 */}
         {scanningQR && <QRScanner onCancel={cancelQRScan} onScanSuccess={handleQRScanSuccess} />}

@@ -76,11 +76,12 @@ const Header: React.FC<HeaderProps> = ({ walletConnected, walletAddress }) => {
       // 드롭다운 닫기
       setShowDisconnect(false);
 
-      window.location.reload();
+      // 메인 페이지로 리다이렉트
+      window.location.href = "/";
     } catch (error) {
       console.error("Error during disconnect:", error);
-      // 에러 발생시에도 페이지 새로고침으로 fallback
-      window.location.reload();
+      // 에러 발생시에도 메인 페이지로 fallback
+      window.location.href = "/";
     }
   };
 

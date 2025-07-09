@@ -1,10 +1,13 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
+import { useCurrentAccount } from "@mysten/dapp-kit";
+import { UserType } from "../utils/constants";
 
 interface User {
   id: string;
   name: string;
   description: string | null;
   walletAddress: string;
+  userType: UserType;
   qrCode: string | null;
   lumaUrl: string | null;
   createdAt: string;
@@ -18,9 +21,12 @@ interface UseUserReturn {
   error: string | null;
   checkUser: (walletAddress: string) => Promise<void>;
   clearUser: () => void;
+  isStore: boolean;
+  isConsumer: boolean;
 }
 
 export const useUser = (): UseUserReturn => {
+  const account = useCurrentAccount();
   const [user, setUser] = useState<User | null>(null);
   const [isNewUser, setIsNewUser] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -68,6 +74,19 @@ export const useUser = (): UseUserReturn => {
     setError(null);
   }, []);
 
+  // 지갑 연결 상태 변화 감지 및 자동 사용자 정보 확인
+  useEffect(() => {
+    if (account?.address) {
+      checkUser(account.address);
+    } else {
+      clearUser();
+    }
+  }, [account?.address, checkUser, clearUser]);
+
+  // 유저 타입 체크 헬퍼 함수
+  const isStore = Boolean(user?.userType === UserType.STORE);
+  const isConsumer = Boolean(user?.userType === UserType.CONSUMER);
+
   return {
     user,
     isNewUser,
@@ -75,5 +94,7 @@ export const useUser = (): UseUserReturn => {
     error,
     checkUser,
     clearUser,
+    isStore,
+    isConsumer,
   };
 };

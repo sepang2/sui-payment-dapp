@@ -13,12 +13,19 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// 사용자 타입 enum
+enum UserType {
+  STORE
+  CONSUMER
+}
+
 // 사용자 정보
 model User {
   id            String   @id @default(cuid())
   name          String // 사용자명
   description   String? // 사용자 설명
   walletAddress String   @unique // 사용자 지갑 주소
+  userType      UserType @default(CONSUMER) // 사용자 타입 (상점/소비자)
   qrCode        String?  @db.LongText // 지갑 주소 QR코드 (base64)
   lumaUrl       String? // Luma 이벤트 URL
   createdAt     DateTime @default(now())
