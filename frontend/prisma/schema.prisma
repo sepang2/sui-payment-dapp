@@ -14,7 +14,7 @@ datasource db {
 }
 
 // 소비자 정보
-model Customer {
+model Consumer {
   id            Int      @id @default(autoincrement())
   name          String? // 사용자명
   walletAddress String   @unique // 사용자 지갑 주소
@@ -23,7 +23,7 @@ model Customer {
 
   transactions Transaction[] // 해당 소비자의 거래 내역
 
-  @@map("customers")
+  @@map("consumers")
 }
 
 // 상점 정보
@@ -33,6 +33,7 @@ model Store {
   description   String? // 상점 설명
   walletAddress String   @unique // 상점 지갑 주소
   uniqueId      String   @unique // QR 코드에 사용될 고유 ID
+  lumaLink      String? // Luma Link
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
@@ -48,14 +49,14 @@ model Transaction {
   txHash String  @unique // 트랜잭션 해시
 
   // 거래 관계 설정
-  customer   Customer @relation(fields: [customerId], references: [id])
-  customerId Int
+  consumer   Consumer @relation(fields: [consumerId], references: [id])
+  consumerId Int
 
   store   Store @relation(fields: [storeId], references: [id])
   storeId Int
 
   // 편의를 위해 주소도 저장
-  fromAddress String // 송금자 지갑 주소 (Customer's wallet)
+  fromAddress String // 송금자 지갑 주소 (Consumer's wallet)
   toAddress   String // 수신자 지갑 주소 (Store's wallet)
 
   createdAt DateTime @default(now())
