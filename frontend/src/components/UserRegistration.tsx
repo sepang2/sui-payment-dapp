@@ -138,7 +138,7 @@ const UserRegistration: React.FC<UserRegistrationProps> = ({ walletAddress, onRe
               name="name"
               value={formData.name}
               onChange={handleInputChange}
-              className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white ${
+              className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 text-black focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white ${
                 errors.name ? "border-red-500" : "border-gray-300"
               }`}
               placeholder="사용자명을 입력하세요"
@@ -154,7 +154,7 @@ const UserRegistration: React.FC<UserRegistrationProps> = ({ walletAddress, onRe
               name="description"
               value={formData.description}
               onChange={handleInputChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white resize-none"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 text-black focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white resize-none"
               placeholder="사용자에 대한 간단한 설명을 입력하세요"
               rows={3}
               maxLength={200}
@@ -170,7 +170,7 @@ const UserRegistration: React.FC<UserRegistrationProps> = ({ walletAddress, onRe
               name="lumaUrl"
               value={formData.lumaUrl}
               onChange={handleInputChange}
-              className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white ${
+              className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 text-black focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white ${
                 errors.lumaUrl ? "border-red-500" : "border-gray-300"
               }`}
               placeholder="https://lu.ma/your-event"
