@@ -46,7 +46,7 @@ const ConsumerDashboard: React.FC<ConsumerDashboardProps> = ({ balance, balanceL
       <div className="flex flex-col items-center p-6 w-full max-w-md">
         {/* 잔액 카드 */}
         <div className="w-full bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
-          <h2 className="text-xl font-bold text-gray-700 dark:text-gray-200 mb-4">{user?.name}의 잔액</h2>
+          <h2 className="text-xl font-bold text-gray-700 dark:text-gray-200 mb-4">{user?.name} 잔액</h2>
           <div className="text-center">
             <p className="text-4xl font-bold text-indigo-600 dark:text-indigo-400 mb-2">
               {balanceLoading ? "로딩 중..." : `${displayBalance.toFixed(3)} SUI`}

@@ -27,12 +27,11 @@ const StoreDashboard: React.FC<StoreDashboardProps> = ({ user, onShowQRCode }) =
   return (
     <div className="flex justify-center">
       <div className="flex flex-col p-6 w-full max-w-md">
-        <h1 className="text-2xl font-bold text-gray-700 dark:text-gray-200 mb-6 text-center">
-          어서오세요 &lt;{user?.name}&gt; 입니다
-        </h1>
+        <h1 className="text-2xl font-bold text-gray-700 dark:text-gray-200 mb-4">결제 QR 코드</h1>
         {/* QR 코드 카드 */}
         <div className="w-full bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
-          <h2 className="text-xl font-bold text-gray-700 dark:text-gray-200 mb-4">결제 QR 코드</h2>
+          <h2 className="text-xl font-bold text-gray-700 dark:text-gray-200 mb-1 text-center">{user?.name}</h2>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-4 text-center">{user?.description}</p>
           {user?.qrCode ? (
             <div className="text-center">
               <button
@@ -55,7 +54,7 @@ const StoreDashboard: React.FC<StoreDashboardProps> = ({ user, onShowQRCode }) =
         </div>
 
         {/* 최근 거래 내역 */}
-        <h2 className="text-xl font-bold text-gray-700 dark:text-gray-200 pt-4 mb-4">최근 거래 내역</h2>
+        <h1 className="text-2xl font-bold text-gray-700 dark:text-gray-200 pt-4 mb-4">최근 거래 내역</h1>
         <TransactionList
           transactions={recentTransactions}
           title=""
