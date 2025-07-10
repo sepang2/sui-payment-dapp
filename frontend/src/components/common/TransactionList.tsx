@@ -82,7 +82,7 @@ const TransactionList: React.FC<TransactionListProps> = ({
 
   return (
     <div className="w-full">
-      {title && <h3 className="text-xl font-bold text-gray-700 dark:text-gray-200 mb-4">{title}</h3>}
+      {title && <h3 className="text-2xl font-bold text-gray-700 dark:text-gray-200 my-4">{title}</h3>}
       <motion.ul
         className="space-y-3"
         variants={listVariants}
