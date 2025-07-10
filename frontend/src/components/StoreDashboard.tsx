@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useTransactions } from "../hooks/useTransactions";
 import TransactionList from "./common/TransactionList";
 import { useRouter } from "next/navigation";
@@ -18,10 +18,19 @@ interface StoreDashboardProps {
 
 const StoreDashboard: React.FC<StoreDashboardProps> = ({ user, onShowQRCode }) => {
   // 실제 DB에서 트랜잭션 데이터 가져오기 (최신 3개)
-  const { transactions: recentTransactions, isLoading: transactionsLoading } = useTransactions(
-    user?.walletAddress || null,
-    "store"
-  );
+  const {
+    transactions: recentTransactions,
+    isLoading: transactionsLoading,
+    refetch,
+  } = useTransactions(user?.walletAddress || null, "store");
+  useEffect(() => {
+    if (!user?.walletAddress) return;
+    const eventSource = new EventSource("/api/transactions/stream");
+    eventSource.onmessage = (event) => {
+      refetch();
+    };
+    return () => eventSource.close();
+  }, [user?.walletAddress, refetch]);
   const router = useRouter();
 
   return (

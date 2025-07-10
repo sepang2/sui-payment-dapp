@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useCallback } from "react";
+import useSWR from "swr";
 
 interface Transaction {
   id: string;
@@ -30,11 +31,13 @@ interface ApiTransaction {
   };
 }
 
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
+
 interface UseTransactionsReturn {
   transactions: Transaction[]; // 최신 N개
   allTransactions: Transaction[]; // 전체
   isLoading: boolean;
-  error: string | null;
+  error: any;
   refetch: () => void;
 }
 
@@ -42,10 +45,12 @@ export function useTransactions(
   walletAddress: string | null,
   userType: "consumer" | "store" | null
 ): UseTransactionsReturn {
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [allTransactions, setAllTransactions] = useState<Transaction[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const apiUrl =
+    walletAddress && userType
+      ? `/api/transactions?walletAddress=${encodeURIComponent(walletAddress)}&userType=${userType}`
+      : null;
+
+  const { data, error, isLoading, mutate: refetch } = useSWR(apiUrl, fetcher); // refreshInterval 제거
 
   const transformApiTransactions = useCallback(
     (
@@ -87,50 +92,14 @@ export function useTransactions(
     []
   );
 
-  const fetchTransactions = useCallback(async () => {
-    if (!walletAddress || !userType) {
-      setTransactions([]);
-      setAllTransactions([]);
-      return;
-    }
+  const transformedTransactions =
+    data && walletAddress && userType ? transformApiTransactions(data.transactions || [], userType, walletAddress) : [];
 
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const response = await fetch(
-        `/api/transactions?walletAddress=${encodeURIComponent(walletAddress)}&userType=${userType}`
-      );
-
-      if (!response.ok) {
-        throw new Error(`Failed to fetch transactions: ${response.status}`);
-      }
-
-      const data = await response.json();
-      const transformedTransactions = transformApiTransactions(data.transactions || [], userType, walletAddress);
-      setAllTransactions(transformedTransactions);
-      setTransactions(transformedTransactions.slice(0, 3));
-    } catch (err) {
-      console.error("Error fetching transactions:", err);
-      setError(err instanceof Error ? err.message : "Failed to fetch transactions");
-      setTransactions([]);
-      setAllTransactions([]);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [walletAddress, userType, transformApiTransactions]);
-
-  useEffect(() => {
-    fetchTransactions();
-  }, [fetchTransactions]);
-
-  const refetch = useCallback(() => {
-    fetchTransactions();
-  }, [fetchTransactions]);
+  const recentTransactions = transformedTransactions.slice(0, 3);
 
   return {
-    transactions,
-    allTransactions,
+    transactions: recentTransactions,
+    allTransactions: transformedTransactions,
     isLoading,
     error,
     refetch,

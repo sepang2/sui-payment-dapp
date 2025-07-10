@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
+import { notifyNewTransaction } from "./stream/route";
 
 const prisma = new PrismaClient();
 
@@ -124,6 +125,9 @@ export async function POST(request: NextRequest) {
         },
       },
     });
+
+    // SSE로 알림 보내기
+    notifyNewTransaction(transaction);
 
     return NextResponse.json({ transaction }, { status: 201 });
   } catch (error) {

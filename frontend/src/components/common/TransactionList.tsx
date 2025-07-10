@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { motion } from "framer-motion";
 import { EXCHANGE_RATE } from "../../utils/constants";
 
 interface Transaction {
@@ -21,6 +22,27 @@ interface TransactionListProps {
   maxItems?: number;
   onCardClick?: () => void; // 카드 클릭 시 실행할 콜백 (선택)
 }
+
+const listVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { y: 20, opacity: 0 },
+  visible: {
+    y: 0,
+    opacity: 1,
+    transition: {
+      duration: 0.3,
+    },
+  },
+};
 
 const TransactionList: React.FC<TransactionListProps> = ({
   transactions,
@@ -61,12 +83,20 @@ const TransactionList: React.FC<TransactionListProps> = ({
   return (
     <div className="w-full">
       {title && <h3 className="text-xl font-bold text-gray-700 dark:text-gray-200 mb-4">{title}</h3>}
-      <div className="space-y-3">
+      <motion.ul
+        className="space-y-3"
+        variants={listVariants}
+        initial="hidden"
+        animate="visible"
+        key={transactions.length} // 데이터 변경 시 애니메이션 재실행
+      >
         {displayTransactions.map((transaction) => (
-          <div
+          <motion.li
             key={transaction.id}
+            variants={itemVariants}
             className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 cursor-pointer hover:bg-indigo-50 dark:hover:bg-gray-700 transition`}
             onClick={onCardClick}
+            layout // 위치 변경 시 애니메이션
           >
             <div className="flex justify-between items-center">
               <div className="flex items-center">
@@ -93,9 +123,9 @@ const TransactionList: React.FC<TransactionListProps> = ({
                 </p>
               </div>
             </div>
-          </div>
+          </motion.li>
         ))}
-      </div>
+      </motion.ul>
     </div>
   );
 };
