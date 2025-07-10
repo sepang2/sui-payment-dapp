@@ -1,6 +1,5 @@
 import { NextRequest } from "next/server";
-
-let clients: any[] = [];
+import { clients } from "../sseClients";
 
 export async function GET(request: NextRequest) {
   const stream = new ReadableStream({
@@ -15,7 +14,8 @@ export async function GET(request: NextRequest) {
 
       // 연결이 끊어지면 클라이언트 목록에서 제거
       request.signal.addEventListener("abort", () => {
-        clients = clients.filter((c) => c !== client);
+        const idx = clients.indexOf(client);
+        if (idx !== -1) clients.splice(idx, 1);
         controller.close();
       });
     },
@@ -28,11 +28,4 @@ export async function GET(request: NextRequest) {
       Connection: "keep-alive",
     },
   });
-}
-
-// 트랜잭션이 생성될 때 호출할 함수
-export function notifyNewTransaction(transaction: any) {
-  for (const client of clients) {
-    client.send(JSON.stringify(transaction));
-  }
 }

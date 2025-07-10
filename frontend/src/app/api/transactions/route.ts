@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
-import { notifyNewTransaction } from "./stream/route";
+import { notifyNewTransaction } from "./sseClients";
 
 const prisma = new PrismaClient();
 
