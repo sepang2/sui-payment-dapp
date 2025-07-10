@@ -108,7 +108,7 @@ export default function ConsumerTransactionsPage() {
 
   if (loading || isLoading) {
     return (
-      <div className="h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <Header walletConnected={isAuthenticated} walletAddress={user?.walletAddress} />
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
@@ -119,7 +119,7 @@ export default function ConsumerTransactionsPage() {
   }
 
   return (
-    <div className="h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Header walletConnected={isAuthenticated} walletAddress={user?.walletAddress} />
       <div className="px-4 py-6 pb-24 max-w-md mx-auto">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">거래 내역</h1>

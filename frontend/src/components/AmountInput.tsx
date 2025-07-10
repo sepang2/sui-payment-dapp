@@ -26,48 +26,48 @@ const AmountInput: React.FC<AmountInputProps> = ({
 
   return (
     <div className="fixed inset-0 bg-white dark:bg-gray-900 flex flex-col">
-      {/* 중앙 콘텐츠 */}
-      <div className="flex-1 flex flex-col items-center justify-center px-6">
+      {/* 상단 콘텐츠 */}
+      <div className="flex-1 flex flex-col items-center px-4 pt-8">
         {/* 카드 아이콘 */}
-        <div className="w-16 h-16 bg-indigo-600 dark:bg-indigo-700 rounded-xl flex items-center justify-center mb-8">
-          <i className="fas fa-credit-card text-white text-2xl"></i>
+        <div className="w-12 h-12 bg-indigo-600 dark:bg-indigo-700 rounded-lg flex items-center justify-center mb-4">
+          <i className="fas fa-credit-card text-white text-lg"></i>
         </div>
 
         {/* 메시지 */}
-        <div className="text-center mb-8 p-4">
-          <h1 className="text-xl font-medium text-gray-800 dark:text-white mb-2">{name}에서</h1>
-          <h2 className="text-xl font-medium text-gray-800 dark:text-white">얼마를 결제할까요?</h2>
+        <div className="text-center mb-6">
+          <h1 className="text-lg font-medium text-gray-800 dark:text-white mb-1">{name}에서</h1>
+          <h2 className="text-lg font-medium text-gray-800 dark:text-white">얼마를 결제할까요?</h2>
         </div>
 
         {/* 금액 표시 */}
-        <div className="text-center mb-4">
-          <p className="text-5xl font-bold text-gray-900 dark:text-white mb-2 pb-2">{coinAmount} SUI</p>
-          <p className="text-gray-500 dark:text-gray-400">지갑 잔고 {availableCoin} SUI</p>
+        <div className="text-center mb-6">
+          <p className="text-4xl font-bold text-gray-900 dark:text-white mb-2">{coinAmount} SUI</p>
+          <p className="text-gray-500 dark:text-gray-400 text-sm">지갑 잔고 {availableCoin} SUI</p>
           {parseFloat(amount) > balance && (
-            <p className="text-red-500 dark:text-red-400 text-sm mt-2 pt-1">잔고가 부족합니다</p>
+            <p className="text-red-500 dark:text-red-400 text-sm mt-2">잔고가 부족합니다</p>
           )}
         </div>
       </div>
 
       {/* 하단 버튼 */}
-      <div className="px-6 pb-2 w-full flex flex-row gap-2">
+      <div className="px-4 pb-2 w-full flex flex-row gap-2">
         <button
           onClick={onCancel}
-          className="bg-gray-400 hover:bg-gray-500 dark:bg-gray-600 dark:hover:bg-gray-700 text-white py-4 rounded-lg font-semibold text-lg transition-colors w-full"
+          className="bg-gray-400 hover:bg-gray-500 dark:bg-gray-600 dark:hover:bg-gray-700 text-white py-3 rounded-lg font-semibold text-base transition-colors w-full"
         >
           취소
         </button>
         <button
           onClick={onProceed}
           disabled={parseFloat(amount) <= 0 || parseFloat(amount) > balance}
-          className="bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-700 dark:hover:bg-indigo-800 disabled:bg-gray-300 dark:disabled:bg-gray-700 text-white py-4 rounded-lg font-semibold text-lg transition-colors w-full"
+          className="bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-700 dark:hover:bg-indigo-800 disabled:bg-gray-300 dark:disabled:bg-gray-700 text-white py-3 rounded-lg font-semibold text-base transition-colors w-full"
         >
           다음
         </button>
       </div>
 
       {/* 키패드 */}
-      <div className="px-6 pb-6">
+      <div className="px-4 pb-4">
         <Keypad onKeyPress={onKeypadPress} />
       </div>
     </div>
