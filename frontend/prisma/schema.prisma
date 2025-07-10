@@ -33,6 +33,7 @@ model Store {
   description   String? // 상점 설명
   walletAddress String   @unique // 상점 지갑 주소
   uniqueId      String   @unique // QR 코드에 사용될 고유 ID
+  qrCode        String? // QR 코드 이미지 (Base64 Data URL)
   lumaLink      String? // Luma Link
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
