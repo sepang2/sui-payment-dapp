@@ -146,7 +146,7 @@ export default function StoreProfilePage() {
 
   if (loading || authLoading) {
     return (
-      <div className="h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <Header walletConnected={isAuthenticated} walletAddress={authUser?.walletAddress} />
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
@@ -158,7 +158,7 @@ export default function StoreProfilePage() {
 
   if (error && !user) {
     return (
-      <div className="h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <Header walletConnected={isAuthenticated} walletAddress={authUser?.walletAddress} />
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
@@ -172,7 +172,7 @@ export default function StoreProfilePage() {
   }
 
   return (
-    <div className="h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Header walletConnected={isAuthenticated} walletAddress={authUser?.walletAddress} />
       <div className="px-4 py-6 pb-24 max-w-md mx-auto">
         <div className="flex items-center justify-between mb-6">

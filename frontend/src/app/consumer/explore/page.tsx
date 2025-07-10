@@ -83,7 +83,7 @@ export default function ConsumerExplorePage() {
 
   if (loading || authLoading) {
     return (
-      <div className="h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <Header walletConnected={isAuthenticated} walletAddress={user?.walletAddress} />
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
@@ -95,7 +95,7 @@ export default function ConsumerExplorePage() {
 
   if (error) {
     return (
-      <div className="h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <Header walletConnected={isAuthenticated} walletAddress={user?.walletAddress} />
         <div className="flex items-center justify-center h-64">
           <div className="text-red-500 dark:text-red-400">Error: {error}</div>
@@ -106,7 +106,7 @@ export default function ConsumerExplorePage() {
   }
 
   return (
-    <div className="h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Header walletConnected={isAuthenticated} walletAddress={user?.walletAddress} />
       <div className="px-4 py-6 pb-24 max-w-md mx-auto">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">이벤트 탐색</h1>

@@ -14,7 +14,7 @@ const Keypad: React.FC<KeypadProps> = ({ onKeyPress }) => {
         <button
           key={num}
           onClick={() => onKeyPress(num.toString())}
-          className="bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-lg py-6 text-2xl font-medium text-gray-800 dark:text-white transition-colors"
+          className="bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-lg py-4 text-xl font-medium text-gray-800 dark:text-white transition-colors"
         >
           {num}
         </button>
@@ -23,19 +23,19 @@ const Keypad: React.FC<KeypadProps> = ({ onKeyPress }) => {
       {/* 마지막 줄: '.', '0', 'backspace' */}
       <button
         onClick={() => onKeyPress(".")}
-        className="bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-lg py-6 text-2xl font-medium text-gray-800 dark:text-white transition-colors"
+        className="bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-lg py-4 text-xl font-medium text-gray-800 dark:text-white transition-colors"
       >
         .
       </button>
       <button
         onClick={() => onKeyPress("0")}
-        className="bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-lg py-6 text-2xl font-medium text-gray-800 dark:text-white transition-colors"
+        className="bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-lg py-4 text-xl font-medium text-gray-800 dark:text-white transition-colors"
       >
         0
       </button>
       <button
         onClick={() => onKeyPress("backspace")}
-        className="bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-lg py-6 text-2xl font-medium text-gray-800 dark:text-white transition-colors flex items-center justify-center"
+        className="bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-lg py-4 text-xl font-medium text-gray-800 dark:text-white transition-colors flex items-center justify-center"
       >
         <i className="fas fa-backspace"></i>
       </button>
