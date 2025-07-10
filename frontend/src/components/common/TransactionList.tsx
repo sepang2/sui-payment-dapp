@@ -41,7 +41,7 @@ const TransactionList: React.FC<TransactionListProps> = ({
   if (transactions.length === 0) {
     return (
       <div className="w-full">
-        <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-4">{title}</h3>
+        {title && <h3 className="text-xl font-bold text-gray-700 dark:text-gray-200 mb-4">{title}</h3>}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 text-center">
           <i className="fas fa-receipt text-3xl text-gray-400 dark:text-gray-500 mb-3"></i>
           <p className="text-gray-500 dark:text-gray-400">{emptyMessage}</p>
@@ -52,7 +52,7 @@ const TransactionList: React.FC<TransactionListProps> = ({
 
   return (
     <div className="w-full">
-      <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-4">{title}</h3>
+      {title && <h3 className="text-xl font-bold text-gray-700 dark:text-gray-200 mb-4">{title}</h3>}
       <div className="space-y-3">
         {displayTransactions.map((transaction) => (
           <div key={transaction.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">

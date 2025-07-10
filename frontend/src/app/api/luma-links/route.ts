@@ -5,9 +5,9 @@ const prisma = new PrismaClient();
 
 export async function GET() {
   try {
-    const users = await prisma.user.findMany({
+    const stores = await prisma.store.findMany({
       where: {
-        lumaUrl: {
+        lumaLink: {
           not: null,
         },
       },
@@ -15,11 +15,11 @@ export async function GET() {
         id: true,
         name: true,
         description: true,
-        lumaUrl: true,
+        lumaLink: true,
       },
     });
 
-    return NextResponse.json(users);
+    return NextResponse.json(stores);
   } catch (error) {
     console.error("Error fetching luma links:", error);
     return NextResponse.json({ error: "Failed to fetch luma links" }, { status: 500 });

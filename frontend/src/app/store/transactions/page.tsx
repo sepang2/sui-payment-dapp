@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useStoreAuth } from "../../../hooks/useAuth";
 import Header from "../../../components/Header";
 import StoreBottomNavigation from "../../../components/StoreBottomNavigation";
+import { EXCHANGE_RATE } from "../../../utils/constants";
 
 interface Transaction {
   id: string;
@@ -42,8 +43,70 @@ const dummyTransactions: Transaction[] = [
 
 export default function StoreTransactionsPage() {
   const { isLoading, user, isAuthenticated } = useStoreAuth();
-  const [transactions] = useState<Transaction[]>(dummyTransactions);
-  const [loading] = useState(false);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [loading, setLoading] = useState(true);
+  const exchangeRate = EXCHANGE_RATE;
+
+  // 거래 내역 조회
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      if (!user?.walletAddress) return;
+
+      try {
+        setLoading(true);
+        const response = await fetch(`/api/transactions?walletAddress=${user.walletAddress}&userType=store`);
+        
+        if (response.ok) {
+          const { transactions: dbTransactions } = await response.json();
+          
+          // DB 데이터를 UI 형식으로 변환
+          const formattedTransactions: Transaction[] = dbTransactions.map((tx: any) => ({
+            id: tx.id.toString(),
+            type: "receive" as const, // Store는 항상 receive (매출)
+            amount: parseFloat(tx.amount),
+            toAddress: tx.toAddress,
+            fromAddress: tx.fromAddress,
+            description: tx.consumer?.name || "Unknown Customer",
+            timestamp: new Date(tx.createdAt).toLocaleString("ko-KR", {
+              year: "numeric",
+              month: "2-digit",
+              day: "2-digit",
+              hour: "2-digit",
+              minute: "2-digit",
+            }),
+            txHash: tx.txHash,
+          }));
+          
+          setTransactions(formattedTransactions);
+        } else {
+          console.error("Failed to fetch transactions");
+          setTransactions([]);
+        }
+      } catch (error) {
+        console.error("Error fetching transactions:", error);
+        setTransactions([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (isAuthenticated && user) {
+      fetchTransactions();
+    }
+  }, [isAuthenticated, user]);
+
+  // 오늘의 매출 계산
+  const today = new Date().toISOString().split("T")[0];
+  const todayTransactions = transactions.filter(
+    (tx) => {
+      const txDate = new Date(tx.timestamp).toISOString().split("T")[0];
+      return txDate === today && tx.type === "receive";
+    }
+  );
+  const todayRevenue = todayTransactions.reduce((sum, tx) => sum + tx.amount, 0);
+
+  // 총 매출 계산 (receive만)
+  const totalRevenue = transactions.filter((tx) => tx.type === "receive").reduce((sum, tx) => sum + tx.amount, 0);
 
   const getTransactionIcon = (type: string) => {
     if (type === "send") return "fas fa-arrow-up text-red-500";
@@ -74,8 +137,29 @@ export default function StoreTransactionsPage() {
     <div className="h-screen bg-gray-50 dark:bg-gray-900">
       <Header walletConnected={isAuthenticated} walletAddress={user?.walletAddress} />
       <div className="px-4 py-6 pb-24 max-w-md mx-auto">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">거래 내역</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">매출 현황</h1>
 
+        {/* 매출 현황 카드 */}
+        <div className="w-full bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="text-center">
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">오늘 매출</p>
+              <p className="text-2xl font-bold text-green-600 dark:text-green-400">{todayRevenue.toFixed(3)} SUI</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                ≈ {(todayRevenue * exchangeRate).toLocaleString()} KRW
+              </p>
+            </div>
+            <div className="text-center">
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">총 매출</p>
+              <p className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">{totalRevenue.toFixed(3)} SUI</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                ≈ {(totalRevenue * exchangeRate).toLocaleString()} KRW
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white pt-4 mb-6">거래 내역</h1>
         {transactions.length === 0 ? (
           <div className="text-center py-12">
             <i className="fas fa-exchange-alt text-4xl text-gray-400 dark:text-gray-500 mb-4"></i>

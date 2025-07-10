@@ -16,27 +16,42 @@ const ScanPage: React.FC = () => {
     return null;
   }
 
-  const handleScanSuccess = (result: string) => {
+  const handleScanSuccess = async (result: string) => {
     try {
-      const qrData = JSON.parse(result);
+      // QR 코드에서 uniqueId 추출 (더 이상 JSON 파싱하지 않음)
+      const uniqueId = result.trim();
 
-      if (qrData.walletAddress) {
-        // 결제 플로우 데이터 저장
-        savePaymentFlowData({
-          name: qrData.name || "Unknown Store",
-          walletAddress: qrData.walletAddress,
-          amount: "0",
-          step: "amount",
-        });
+      if (uniqueId) {
+        // uniqueId로 Store 정보 조회
+        const response = await fetch(`/api/stores/${uniqueId}`);
 
-        // 금액 입력 페이지로 이동
-        router.push("/consumer/amount");
+        if (!response.ok) {
+          throw new Error("Store not found");
+        }
+
+        const { store } = await response.json();
+
+        if (store) {
+          // 결제 플로우 데이터 저장
+          savePaymentFlowData({
+            name: store.name,
+            walletAddress: store.walletAddress,
+            amount: "0",
+            step: "amount",
+          });
+
+          // 금액 입력 페이지로 이동
+          router.push("/consumer/amount");
+        } else {
+          console.error("Store data not found");
+          handleCancel();
+        }
       } else {
         console.error("Invalid QR code data");
         handleCancel();
       }
     } catch (error) {
-      console.error("QR scan result parsing failed:", error);
+      console.error("QR scan processing failed:", error);
       handleCancel();
     }
   };

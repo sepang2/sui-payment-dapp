@@ -5,11 +5,12 @@ import { UserType } from "../utils/constants";
 interface User {
   id: string;
   name: string;
-  description: string | null;
+  description?: string | null;
   walletAddress: string;
   userType: UserType;
-  qrCode: string | null;
-  lumaUrl: string | null;
+  qrCode?: string | null;
+  uniqueId?: string;
+  lumaLink?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -43,21 +44,46 @@ export const useUser = (): UseUserReturn => {
     setError(null);
 
     try {
-      const response = await fetch(`/api/users?walletAddress=${encodeURIComponent(walletAddress)}`);
+      // Consumer API 확인
+      const consumerResponse = await fetch(`/api/consumers?walletAddress=${encodeURIComponent(walletAddress)}`);
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch user information");
+      if (consumerResponse.ok) {
+        const consumerData = await consumerResponse.json();
+
+        if (consumerData.consumer) {
+          // Consumer 데이터를 User 형식으로 변환
+          const user: User = {
+            ...consumerData.consumer,
+            userType: UserType.CONSUMER,
+          };
+          setUser(user);
+          setIsNewUser(false);
+          return;
+        }
       }
 
-      const data = await response.json();
+      // Store API 확인
+      const storeResponse = await fetch(`/api/stores?walletAddress=${encodeURIComponent(walletAddress)}`);
 
-      if (data.user) {
-        setUser(data.user);
-        setIsNewUser(false);
-      } else {
-        setUser(null);
-        setIsNewUser(true);
+      if (storeResponse.ok) {
+        const storeData = await storeResponse.json();
+
+        if (storeData.store) {
+          // Store 데이터를 User 형식으로 변환
+          const user: User = {
+            ...storeData.store,
+            userType: UserType.STORE,
+            lumaLink: storeData.store.lumaLink,
+          };
+          setUser(user);
+          setIsNewUser(false);
+          return;
+        }
       }
+
+      // 둘 다 없으면 신규 사용자
+      setUser(null);
+      setIsNewUser(true);
     } catch (err) {
       console.error("Error checking user:", err);
       setError(err instanceof Error ? err.message : "Unknown error occurred");

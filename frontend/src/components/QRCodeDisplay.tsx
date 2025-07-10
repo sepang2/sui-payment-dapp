@@ -7,6 +7,7 @@ interface QRCodeDisplayProps {
     name: string;
     description?: string;
     walletAddress: string;
+    uniqueId?: string;
     qrCode?: string;
   };
   onClose: () => void;

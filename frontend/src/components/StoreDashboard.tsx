@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import { EXCHANGE_RATE } from "../utils/constants";
 import TransactionList from "./common/TransactionList";
 
 interface StoreDashboardProps {
@@ -9,6 +8,7 @@ interface StoreDashboardProps {
     name: string;
     description?: string;
     walletAddress: string;
+    uniqueId?: string;
     qrCode?: string;
   } | null;
   onShowQRCode: () => void;
@@ -46,52 +46,22 @@ const dummyStoreTransactions = [
 ];
 
 const StoreDashboard: React.FC<StoreDashboardProps> = ({ user, onShowQRCode }) => {
-  const exchangeRate = EXCHANGE_RATE;
   const [recentTransactions] = useState(dummyStoreTransactions);
-
-  // 오늘의 매출 계산
-  const today = new Date().toISOString().split("T")[0];
-  const todayTransactions = recentTransactions.filter((tx) => tx.timestamp.split(" ")[0] === today.replace(/-/g, "-"));
-  const todayRevenue = todayTransactions.reduce((sum, tx) => sum + tx.amount, 0);
-
-  // 총 매출 계산 (더미 데이터 기준)
-  const totalRevenue = recentTransactions.reduce((sum, tx) => sum + tx.amount, 0);
 
   return (
     <div className="flex justify-center">
-      <div className="flex flex-col items-center p-6 w-full max-w-md">
-        {/* 매출 현황 카드 */}
-        <div className="w-full bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
-          <h2 className="text-xl font-bold text-gray-700 dark:text-gray-200 mb-4">매출 현황</h2>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="text-center">
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">오늘 매출</p>
-              <p className="text-2xl font-bold text-green-600 dark:text-green-400">{todayRevenue.toFixed(3)} SUI</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                ≈ {(todayRevenue * exchangeRate).toLocaleString()} KRW
-              </p>
-            </div>
-            <div className="text-center">
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">총 매출</p>
-              <p className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">{totalRevenue.toFixed(3)} SUI</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                ≈ {(totalRevenue * exchangeRate).toLocaleString()} KRW
-              </p>
-            </div>
-          </div>
-        </div>
-
+      <div className="flex flex-col p-6 w-full max-w-md">
+        <h2 className="text-xl font-bold text-gray-700 dark:text-gray-200 mb-4">결제 QR 코드</h2>
         {/* QR 코드 카드 */}
         <div className="w-full bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
-          <h2 className="text-xl font-bold text-gray-700 dark:text-gray-200 mb-4">결제 QR 코드</h2>
           {user?.qrCode ? (
             <div className="text-center">
               <button
                 onClick={onShowQRCode}
-                className="hover:opacity-80 transition-opacity cursor-pointer p-4 rounded-lg border-2 border-gray-200 dark:border-gray-600 hover:border-indigo-300 dark:hover:border-indigo-500 bg-white"
+                className="hover:opacity-80 transition-opacity cursor-pointer p-2 rounded-lg border-2 border-gray-200 dark:border-gray-600 hover:border-indigo-300 dark:hover:border-indigo-500 bg-white"
                 title="QR 코드 크게 보기"
               >
-                <img src={user.qrCode} alt="결제 QR 코드" className="w-32 h-32 mx-auto rounded-md" />
+                <img src={user.qrCode} alt="결제 QR 코드" className="w-36 h-36 mx-auto rounded-md" />
               </button>
               <p className="text-sm text-gray-500 dark:text-gray-400 mt-3">
                 고객이 이 QR 코드를 스캔하여 결제할 수 있습니다
@@ -108,10 +78,11 @@ const StoreDashboard: React.FC<StoreDashboardProps> = ({ user, onShowQRCode }) =
         </div>
 
         {/* 최근 거래 내역 */}
+        <h2 className="text-xl font-bold text-gray-700 dark:text-gray-200 pt-4 mb-4">최근 거래 내역</h2>
         <TransactionList
           transactions={recentTransactions}
-          title="최근 매출 내역"
-          emptyMessage="아직 매출 내역이 없습니다"
+          title=""
+          emptyMessage="아직 거래 내역이 없습니다"
           maxItems={5}
         />
       </div>

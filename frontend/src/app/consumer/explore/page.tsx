@@ -9,7 +9,7 @@ interface LumaLink {
   id: string;
   name: string;
   description: string | null;
-  lumaUrl: string;
+  lumaLink: string;
 }
 
 interface LumaMetadata {
@@ -45,7 +45,7 @@ export default function ConsumerExplorePage() {
 
       // 각 루마 링크에 대해 메타데이터 가져오기
       data.forEach((link: LumaLink) => {
-        fetchMetadata(link.id, link.lumaUrl);
+        fetchMetadata(link.id, link.lumaLink);
       });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
@@ -121,7 +121,7 @@ export default function ConsumerExplorePage() {
               <div
                 key={link.id}
                 className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
-                onClick={() => handleLinkClick(link.lumaUrl)}
+                onClick={() => handleLinkClick(link.lumaLink)}
               >
                 <div className="flex items-center p-3">
                   {/* 썸네일 영역 */}
