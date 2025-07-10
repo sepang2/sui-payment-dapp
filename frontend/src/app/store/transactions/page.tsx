@@ -26,7 +26,7 @@ const dummyTransactions: Transaction[] = [
     toAddress: "0x8f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a",
     fromAddress: "0x7e9f8g0h1i2j3k4l5m6n7o8p9q0r1s2t3u4v5w6x7y8z9a0b1c2d3e4f5g6h7i8j",
     description: "카페 라떼",
-    timestamp: "2025-01-07 09:30",
+    timestamp: "2025-01-07T09:30:00.000Z",
     txHash: "EKpob2HV2TSGhfv6gLYcvMC5RcTS9KxSxndoToiN5yN8",
   },
   {
@@ -36,7 +36,7 @@ const dummyTransactions: Transaction[] = [
     toAddress: "0x7e9f8g0h1i2j3k4l5m6n7o8p9q0r1s2t3u4v5w6x7y8z9a0b1c2d3e4f5g6h7i8j",
     fromAddress: "0x8f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a",
     description: "아이스 아메리카노",
-    timestamp: "2025-01-06 19:45",
+    timestamp: "2025-01-06T19:45:00.000Z",
     txHash: "owSgWNK5tPSvjeG4NEG6fPC6Yz8ddUBwqbFG1U6LP89",
   },
 ];
@@ -55,10 +55,10 @@ export default function StoreTransactionsPage() {
       try {
         setLoading(true);
         const response = await fetch(`/api/transactions?walletAddress=${user.walletAddress}&userType=store`);
-        
+
         if (response.ok) {
           const { transactions: dbTransactions } = await response.json();
-          
+
           // DB 데이터를 UI 형식으로 변환
           const formattedTransactions: Transaction[] = dbTransactions.map((tx: any) => ({
             id: tx.id.toString(),
@@ -67,16 +67,10 @@ export default function StoreTransactionsPage() {
             toAddress: tx.toAddress,
             fromAddress: tx.fromAddress,
             description: tx.consumer?.name || "Unknown Customer",
-            timestamp: new Date(tx.createdAt).toLocaleString("ko-KR", {
-              year: "numeric",
-              month: "2-digit",
-              day: "2-digit",
-              hour: "2-digit",
-              minute: "2-digit",
-            }),
+            timestamp: tx.createdAt, // ISO 문자열로 저장
             txHash: tx.txHash,
           }));
-          
+
           setTransactions(formattedTransactions);
         } else {
           console.error("Failed to fetch transactions");
@@ -97,12 +91,19 @@ export default function StoreTransactionsPage() {
 
   // 오늘의 매출 계산
   const today = new Date().toISOString().split("T")[0];
-  const todayTransactions = transactions.filter(
-    (tx) => {
-      const txDate = new Date(tx.timestamp).toISOString().split("T")[0];
-      return txDate === today && tx.type === "receive";
+  const todayTransactions = transactions.filter((tx) => {
+    try {
+      const txDate = new Date(tx.timestamp);
+      if (isNaN(txDate.getTime())) {
+        return false; // 유효하지 않은 날짜는 제외
+      }
+      const txDateString = txDate.toISOString().split("T")[0];
+      return txDateString === today && tx.type === "receive";
+    } catch (error) {
+      console.error("Error parsing transaction date:", error);
+      return false; // 에러 발생시 제외
     }
-  );
+  });
   const todayRevenue = todayTransactions.reduce((sum, tx) => sum + tx.amount, 0);
 
   // 총 매출 계산 (receive만)
@@ -119,6 +120,25 @@ export default function StoreTransactionsPage() {
 
   const formatAddress = (address: string) => {
     return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
+  };
+
+  const formatTimestamp = (timestamp: string) => {
+    try {
+      const date = new Date(timestamp);
+      if (isNaN(date.getTime())) {
+        return timestamp; // 유효하지 않은 날짜인 경우 원본 문자열 반환
+      }
+      return date.toLocaleString("ko-KR", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    } catch (error) {
+      console.error("Error formatting timestamp:", error);
+      return timestamp; // 에러 발생시 원본 문자열 반환
+    }
   };
 
   if (loading || isLoading) {
@@ -179,7 +199,7 @@ export default function StoreTransactionsPage() {
                         {transaction.description}
                       </h3>
                       <div className="text-xs text-gray-500 dark:text-gray-400 space-y-1">
-                        <p>{transaction.timestamp}</p>
+                        <p>{formatTimestamp(transaction.timestamp)}</p>
                         {transaction.type === "send" && transaction.toAddress && (
                           <p>to: {formatAddress(transaction.toAddress)}</p>
                         )}

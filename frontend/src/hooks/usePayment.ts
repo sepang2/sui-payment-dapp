@@ -16,8 +16,8 @@ export function usePayment() {
   const [lastTransactionDigest, setLastTransactionDigest] = useState<string>("");
   const { mutate: signAndExecuteTransaction } = useSignAndExecuteTransaction();
 
-  const processPayment = async (paymentRequest: PaymentRequest) => {
-    if (isProcessing) return;
+  const processPayment = async (paymentRequest: PaymentRequest): Promise<string> => {
+    if (isProcessing) throw new Error("Payment already in progress");
 
     setIsProcessing(true);
 
@@ -32,7 +32,7 @@ export function usePayment() {
 
       const transaction = createSuiTransferTransaction(paymentRequest.walletAddress, finalAmount);
 
-      await new Promise<void>((resolve, reject) => {
+      return new Promise<string>((resolve, reject) => {
         signAndExecuteTransaction(
           {
             transaction,
@@ -41,7 +41,7 @@ export function usePayment() {
           {
             onSuccess: (result) => {
               setLastTransactionDigest(result.digest);
-              resolve();
+              resolve(result.digest);
             },
             onError: (error) => {
               reject(error);

@@ -101,7 +101,7 @@ const PaymentConfirmation: React.FC<PaymentConfirmationProps> = ({
         <div className="flex gap-3 w-full">
           <button
             onClick={onCancel}
-            className="flex-1 max-w-1/3 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-300 py-3 rounded-lg font-semibold text-base transition-colors border border-gray-300 dark:border-gray-600"
+            className="flex-1 max-w-1/3 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-300 py-3 rounded-lg font-semibold text-base transition-colors"
           >
             그만할래요
           </button>
