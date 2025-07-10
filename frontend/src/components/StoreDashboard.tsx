@@ -8,6 +8,7 @@ interface StoreDashboardProps {
     name: string;
     description?: string;
     walletAddress: string;
+    uniqueId?: string;
     qrCode?: string;
   } | null;
   onShowQRCode: () => void;

@@ -52,9 +52,14 @@ export default function Home() {
     }
   }, [user, userLoading, showRegistration, isInitializing, router]);
 
-  const handleRegistrationComplete = () => {
+  const handleRegistrationComplete = (userType: UserType) => {
     setShowRegistration(false);
-    // 사용자 정보는 useUser 훅에서 자동으로 업데이트되고 위의 useEffect에서 리다이렉트됨
+    // 사용자 유형에 따라 즉시 해당 홈으로 이동
+    if (userType === UserType.STORE) {
+      router.push("/store/home");
+    } else if (userType === UserType.CONSUMER) {
+      router.push("/consumer/home");
+    }
   };
 
   const handleRegistrationCancel = () => {

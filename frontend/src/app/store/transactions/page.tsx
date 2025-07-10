@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useStoreAuth } from "../../../hooks/useAuth";
 import Header from "../../../components/Header";
 import StoreBottomNavigation from "../../../components/StoreBottomNavigation";
@@ -43,18 +43,69 @@ const dummyTransactions: Transaction[] = [
 
 export default function StoreTransactionsPage() {
   const { isLoading, user, isAuthenticated } = useStoreAuth();
-  const [transactions] = useState<Transaction[]>(dummyTransactions);
-  const [loading] = useState(false);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [loading, setLoading] = useState(true);
   const exchangeRate = EXCHANGE_RATE;
+
+  // 거래 내역 조회
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      if (!user?.walletAddress) return;
+
+      try {
+        setLoading(true);
+        const response = await fetch(`/api/transactions?walletAddress=${user.walletAddress}&userType=store`);
+        
+        if (response.ok) {
+          const { transactions: dbTransactions } = await response.json();
+          
+          // DB 데이터를 UI 형식으로 변환
+          const formattedTransactions: Transaction[] = dbTransactions.map((tx: any) => ({
+            id: tx.id.toString(),
+            type: "receive" as const, // Store는 항상 receive (매출)
+            amount: parseFloat(tx.amount),
+            toAddress: tx.toAddress,
+            fromAddress: tx.fromAddress,
+            description: tx.consumer?.name || "Unknown Customer",
+            timestamp: new Date(tx.createdAt).toLocaleString("ko-KR", {
+              year: "numeric",
+              month: "2-digit",
+              day: "2-digit",
+              hour: "2-digit",
+              minute: "2-digit",
+            }),
+            txHash: tx.txHash,
+          }));
+          
+          setTransactions(formattedTransactions);
+        } else {
+          console.error("Failed to fetch transactions");
+          setTransactions([]);
+        }
+      } catch (error) {
+        console.error("Error fetching transactions:", error);
+        setTransactions([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (isAuthenticated && user) {
+      fetchTransactions();
+    }
+  }, [isAuthenticated, user]);
 
   // 오늘의 매출 계산
   const today = new Date().toISOString().split("T")[0];
   const todayTransactions = transactions.filter(
-    (tx) => tx.timestamp.split(" ")[0] === today.replace(/-/g, "-") && tx.type === "receive"
+    (tx) => {
+      const txDate = new Date(tx.timestamp).toISOString().split("T")[0];
+      return txDate === today && tx.type === "receive";
+    }
   );
   const todayRevenue = todayTransactions.reduce((sum, tx) => sum + tx.amount, 0);
 
-  // 총 매출 계산 (더미 데이터 기준, receive만)
+  // 총 매출 계산 (receive만)
   const totalRevenue = transactions.filter((tx) => tx.type === "receive").reduce((sum, tx) => sum + tx.amount, 0);
 
   const getTransactionIcon = (type: string) => {

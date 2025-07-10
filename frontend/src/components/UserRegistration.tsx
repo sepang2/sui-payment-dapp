@@ -6,7 +6,7 @@ import { UserType } from "../utils/constants";
 
 interface UserRegistrationProps {
   walletAddress: string;
-  onRegistrationComplete: () => void;
+  onRegistrationComplete: (userType: UserType) => void;
   onCancel: () => void;
 }
 
@@ -14,12 +14,12 @@ const UserRegistration: React.FC<UserRegistrationProps> = ({ walletAddress, onRe
   const [formData, setFormData] = useState<{
     name: string;
     description: string;
-    lumaUrl: string;
+    lumaLink: string;
     userType: UserType;
   }>({
     name: "",
     description: "",
-    lumaUrl: "",
+    lumaLink: "",
     userType: UserType.CONSUMER, // 기본값은 소비자
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -32,8 +32,8 @@ const UserRegistration: React.FC<UserRegistrationProps> = ({ walletAddress, onRe
       newErrors.name = "사용자명을 입력해주세요.";
     }
 
-    if (formData.lumaUrl && !isValidUrl(formData.lumaUrl)) {
-      newErrors.lumaUrl = "올바른 URL 형식으로 입력해주세요.";
+    if (formData.lumaLink && !isValidUrl(formData.lumaLink)) {
+      newErrors.lumaLink = "올바른 URL 형식으로 입력해주세요.";
     }
 
     setErrors(newErrors);
@@ -49,15 +49,10 @@ const UserRegistration: React.FC<UserRegistrationProps> = ({ walletAddress, onRe
     }
   };
 
-  const generateQRCode = async (walletAddress: string, name: string): Promise<string> => {
+  const generateQRCode = async (uniqueId: string): Promise<string> => {
     try {
-      // QR 코드에 포함될 데이터 (JSON 형태)
-      const qrData = {
-        name: name,
-        walletAddress: walletAddress,
-      };
-
-      const qrCodeDataURL = await QRCode.toDataURL(JSON.stringify(qrData), {
+      // QR 코드에 포함될 데이터 - Store의 uniqueId만 포함
+      const qrCodeDataURL = await QRCode.toDataURL(uniqueId, {
         width: 300,
         margin: 2,
         color: {
@@ -105,26 +100,66 @@ const UserRegistration: React.FC<UserRegistrationProps> = ({ walletAddress, onRe
     setIsSubmitting(true);
 
     try {
-      // 지갑 주소와 사용자 정보로 QR코드 생성
-      const qrCodeDataURL = await generateQRCode(walletAddress, formData.name.trim());
+      if (formData.userType === UserType.CONSUMER) {
+        // Consumer 등록
+        const response = await fetch("/api/consumers", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: formData.name.trim(),
+            walletAddress,
+          }),
+        });
 
-      const response = await fetch("/api/users", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          ...formData,
-          walletAddress,
-          qrCode: qrCodeDataURL,
-        }),
-      });
+        if (!response.ok) {
+          throw new Error("Consumer 등록에 실패했습니다.");
+        }
+      } else {
+        // Store 등록
+        const response = await fetch("/api/stores", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: formData.name.trim(),
+            description: formData.description?.trim() || null,
+            walletAddress,
+            lumaLink: formData.lumaLink?.trim() || null,
+          }),
+        });
 
-      if (!response.ok) {
-        throw new Error("등록에 실패했습니다.");
+        if (!response.ok) {
+          throw new Error("Store 등록에 실패했습니다.");
+        }
+
+        const { store } = await response.json();
+
+        // Store 등록 성공 시 uniqueId로 QR 코드 생성 후 DB에 저장
+        if (store?.uniqueId) {
+          const qrCodeDataURL = await generateQRCode(store.uniqueId);
+
+          // QR 코드를 Store에 업데이트
+          const updateResponse = await fetch("/api/stores", {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              walletAddress,
+              qrCode: qrCodeDataURL,
+            }),
+          });
+
+          if (!updateResponse.ok) {
+            console.warn("QR 코드 업데이트에 실패했지만 Store 등록은 완료되었습니다.");
+          }
+        }
       }
 
-      onRegistrationComplete();
+      onRegistrationComplete(formData.userType);
     } catch (error) {
       console.error("Registration error:", error);
       setErrors({ submit: "등록 중 오류가 발생했습니다. 다시 시도해주세요." });
@@ -217,15 +252,15 @@ const UserRegistration: React.FC<UserRegistrationProps> = ({ walletAddress, onRe
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Luma 이벤트 URL</label>
               <input
                 type="url"
-                name="lumaUrl"
-                value={formData.lumaUrl}
+                name="lumaLink"
+                value={formData.lumaLink}
                 onChange={handleInputChange}
                 className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 text-black focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white ${
-                  errors.lumaUrl ? "border-red-500" : "border-gray-300"
+                  errors.lumaLink ? "border-red-500" : "border-gray-300"
                 }`}
                 placeholder="https://lu.ma/your-event"
               />
-              {errors.lumaUrl && <p className="text-red-500 text-sm mt-1">{errors.lumaUrl}</p>}
+              {errors.lumaLink && <p className="text-red-500 text-sm mt-1">{errors.lumaLink}</p>}
             </div>
           )}
 

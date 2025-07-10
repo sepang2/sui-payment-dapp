@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useConsumerAuth } from "../../../hooks/useAuth";
 import Header from "../../../components/Header";
 import ConsumerBottomNavigation from "../../../components/ConsumerBottomNavigation";
@@ -42,8 +42,56 @@ const dummyTransactions: Transaction[] = [
 
 export default function ConsumerTransactionsPage() {
   const { isLoading, user, isAuthenticated } = useConsumerAuth();
-  const [transactions] = useState<Transaction[]>(dummyTransactions);
-  const [loading] = useState(false);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // 거래 내역 조회
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      if (!user?.walletAddress) return;
+
+      try {
+        setLoading(true);
+        const response = await fetch(`/api/transactions?walletAddress=${user.walletAddress}&userType=consumer`);
+
+        if (response.ok) {
+          const { transactions: dbTransactions } = await response.json();
+
+          // DB 데이터를 UI 형식으로 변환
+          const formattedTransactions: Transaction[] = dbTransactions.map((tx: any) => ({
+            id: tx.id.toString(),
+            type: "send" as const, // Consumer는 항상 send (결제)
+            amount: parseFloat(tx.amount),
+            toAddress: tx.toAddress,
+            fromAddress: tx.fromAddress,
+            description: tx.store?.name || "Unknown Store",
+            timestamp: new Date(tx.createdAt).toLocaleString("ko-KR", {
+              year: "numeric",
+              month: "2-digit",
+              day: "2-digit",
+              hour: "2-digit",
+              minute: "2-digit",
+            }),
+            txHash: tx.txHash,
+          }));
+
+          setTransactions(formattedTransactions);
+        } else {
+          console.error("Failed to fetch transactions");
+          setTransactions([]);
+        }
+      } catch (error) {
+        console.error("Error fetching transactions:", error);
+        setTransactions([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (isAuthenticated && user) {
+      fetchTransactions();
+    }
+  }, [isAuthenticated, user]);
 
   const getTransactionIcon = (type: string) => {
     if (type === "send") return "fas fa-arrow-up text-red-500";

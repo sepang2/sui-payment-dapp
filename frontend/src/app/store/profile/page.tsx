@@ -10,8 +10,8 @@ interface User {
   name: string;
   description: string | null;
   walletAddress: string;
-  userType: string;
-  lumaUrl: string | null;
+  uniqueId: string;
+  lumaLink: string | null;
   qrCode: string | null;
   createdAt: string;
   updatedAt: string;
@@ -30,7 +30,7 @@ export default function StoreProfilePage() {
   const [editForm, setEditForm] = useState({
     name: "",
     description: "",
-    lumaUrl: "",
+    lumaLink: "",
   });
 
   useEffect(() => {
@@ -41,18 +41,18 @@ export default function StoreProfilePage() {
 
   const fetchUserInfo = async () => {
     try {
-      const response = await fetch(`/api/users?walletAddress=${authUser?.walletAddress}`);
+      const response = await fetch(`/api/stores?walletAddress=${authUser?.walletAddress}`);
       if (!response.ok) {
         throw new Error("Failed to fetch user info");
       }
       const data = await response.json();
 
-      if (data.user) {
-        setUser(data.user);
+      if (data.store) {
+        setUser(data.store);
         setEditForm({
-          name: data.user.name || "",
-          description: data.user.description || "",
-          lumaUrl: data.user.lumaUrl || "",
+          name: data.store.name || "",
+          description: data.store.description || "",
+          lumaLink: data.store.lumaLink || "",
         });
       }
     } catch (err) {
@@ -71,7 +71,7 @@ export default function StoreProfilePage() {
       setEditForm({
         name: user.name || "",
         description: user.description || "",
-        lumaUrl: user.lumaUrl || "",
+        lumaLink: user.lumaLink || "",
       });
     }
     setEditing(false);
@@ -82,7 +82,7 @@ export default function StoreProfilePage() {
 
     setSaving(true);
     try {
-      const response = await fetch("/api/users", {
+      const response = await fetch("/api/stores", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -91,7 +91,7 @@ export default function StoreProfilePage() {
           walletAddress: authUser.walletAddress,
           name: editForm.name,
           description: editForm.description,
-          lumaUrl: editForm.lumaUrl,
+          lumaLink: editForm.lumaLink,
         }),
       });
 
@@ -100,7 +100,7 @@ export default function StoreProfilePage() {
       }
 
       const data = await response.json();
-      setUser(data.user);
+      setUser(data.store);
       setEditing(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to save changes");
@@ -245,21 +245,21 @@ export default function StoreProfilePage() {
                 {editing ? (
                   <input
                     type="url"
-                    value={editForm.lumaUrl}
-                    onChange={(e) => handleInputChange("lumaUrl", e.target.value)}
+                    value={editForm.lumaLink}
+                    onChange={(e) => handleInputChange("lumaLink", e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 text-black dark:text-white"
                     placeholder="https://lu.ma/..."
                   />
                 ) : (
                   <div className="px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600">
-                    {user.lumaUrl ? (
+                    {user.lumaLink ? (
                       <a
-                        href={user.lumaUrl}
+                        href={user.lumaLink}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-indigo-600 dark:text-indigo-400 hover:underline break-all"
                       >
-                        {user.lumaUrl}
+                        {user.lumaLink}
                       </a>
                     ) : (
                       <p className="text-gray-500 dark:text-gray-400 italic">Luma URL이 없습니다.</p>
