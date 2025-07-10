@@ -9,6 +9,7 @@ interface Transaction {
   amount: number;
   description: string;
   timestamp: string;
+  rawTimestamp: string; // ISO 날짜 형식으로 날짜 비교용
   fromAddress?: string;
   toAddress?: string;
 }
@@ -18,6 +19,7 @@ interface TransactionListProps {
   title?: string;
   emptyMessage?: string;
   maxItems?: number;
+  onCardClick?: () => void; // 카드 클릭 시 실행할 콜백 (선택)
 }
 
 const TransactionList: React.FC<TransactionListProps> = ({
@@ -25,6 +27,7 @@ const TransactionList: React.FC<TransactionListProps> = ({
   title = "최근 거래 내역",
   emptyMessage = "아직 거래 내역이 없습니다",
   maxItems = 5,
+  onCardClick,
 }) => {
   const exchangeRate = EXCHANGE_RATE;
   const displayTransactions = transactions.slice(0, maxItems);
@@ -36,6 +39,11 @@ const TransactionList: React.FC<TransactionListProps> = ({
 
   const getAmountColor = (type: string) => {
     return type === "send" ? "text-red-500 dark:text-red-400" : "text-green-500 dark:text-green-400";
+  };
+
+  const formatAddress = (address: string | undefined) => {
+    if (!address) return "Unknown Address";
+    return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
   };
 
   if (transactions.length === 0) {
@@ -55,7 +63,11 @@ const TransactionList: React.FC<TransactionListProps> = ({
       {title && <h3 className="text-xl font-bold text-gray-700 dark:text-gray-200 mb-4">{title}</h3>}
       <div className="space-y-3">
         {displayTransactions.map((transaction) => (
-          <div key={transaction.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
+          <div
+            key={transaction.id}
+            className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 cursor-pointer hover:bg-indigo-50 dark:hover:bg-gray-700 transition`}
+            onClick={onCardClick}
+          >
             <div className="flex justify-between items-center">
               <div className="flex items-center">
                 <div className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center mr-3">
@@ -63,6 +75,11 @@ const TransactionList: React.FC<TransactionListProps> = ({
                 </div>
                 <div>
                   <p className="font-medium text-gray-900 dark:text-white">{transaction.description}</p>
+                  <p className="text-xs text-gray-400 mt-1">
+                    {transaction.type === "send"
+                      ? `to: ${formatAddress(transaction.toAddress)}`
+                      : `from: ${formatAddress(transaction.fromAddress)}`}
+                  </p>
                   <p className="text-sm text-gray-500 dark:text-gray-400">{transaction.timestamp}</p>
                 </div>
               </div>
