@@ -11,6 +11,11 @@ export interface PaymentFlowData {
   name?: string;
   walletAddress?: string;
   step?: "scan" | "amount" | "confirm" | "success";
+
+  // 트랜잭션 정보
+  txHash?: string;
+  finalAmount?: number;
+  senderWalletAddress?: string;
 }
 
 const PAYMENT_FLOW_KEY = "payment-flow-data";

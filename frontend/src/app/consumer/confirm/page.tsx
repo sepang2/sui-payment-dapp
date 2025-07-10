@@ -15,7 +15,7 @@ const ConfirmPage: React.FC = () => {
   const account = useCurrentAccount();
   const { isAuthenticated } = useConsumerAuth();
   const { balance, isPending: balanceLoading, refetch: refetchBalance } = useBalance();
-  const { processPayment, isProcessing, lastTransactionDigest } = usePayment();
+  const { processPayment, isProcessing } = usePayment();
   const [amount, setAmount] = useState<string>("0");
   const [name, setName] = useState<string>("");
   const [walletAddress, setWalletAddress] = useState<string>("");
@@ -56,35 +56,15 @@ const ConfirmPage: React.FC = () => {
     };
 
     try {
-      await processPayment(paymentRequest);
+      // 결제 처리 및 트랜잭션 해시 받기
+      const txHash = await processPayment(paymentRequest);
 
-      // 결제 성공 시 Transaction DB에 저장
-      try {
-        const transactionResponse = await fetch("/api/transactions", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            amount: finalAmount,
-            txHash: lastTransactionDigest,
-            fromAddress: account.address,
-            toAddress: walletAddress,
-          }),
-        });
-
-        if (!transactionResponse.ok) {
-          console.warn("Transaction DB 저장에 실패했지만 결제는 완료되었습니다.");
-        } else {
-          console.log("Transaction successfully saved to database");
-        }
-      } catch (dbError) {
-        console.warn("Transaction DB 저장 중 오류:", dbError);
-      }
-
-      // 결제 성공 시 success 페이지로 이동
+      // 트랜잭션 정보를 paymentFlowData에 저장
       savePaymentFlowData({
         step: "success",
+        txHash,
+        finalAmount,
+        senderWalletAddress: account.address,
       });
 
       router.push("/consumer/success");
