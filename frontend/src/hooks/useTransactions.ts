@@ -13,6 +13,7 @@ interface Transaction {
   fromAddress?: string;
   toAddress?: string;
   txHash: string;
+  status: "PENDING" | "APPROVED" | "REJECTED"; // 거래 상태
 }
 
 interface ApiTransaction {
@@ -22,6 +23,7 @@ interface ApiTransaction {
   fromAddress: string;
   toAddress: string;
   createdAt: string;
+  status: "PENDING" | "APPROVED" | "REJECTED"; // 거래 상태
   consumer?: {
     name: string;
     walletAddress: string;
@@ -40,6 +42,11 @@ interface UseTransactionsReturn {
   isLoading: boolean;
   error: any;
   refetch: () => void;
+  updateTransactionStatus: (
+    transactionId: string,
+    status: "APPROVED" | "REJECTED",
+    storeWalletAddress: string
+  ) => Promise<boolean>;
 }
 
 export function useTransactions(
@@ -51,7 +58,7 @@ export function useTransactions(
       ? `/api/transactions?walletAddress=${encodeURIComponent(walletAddress)}&userType=${userType}`
       : null;
 
-  const { data, error, isLoading, mutate: refetch } = useSWR(apiUrl, fetcher); // refreshInterval 제거
+  const { data, error, isLoading, mutate: refetch } = useSWR(apiUrl, fetcher);
 
   const transformApiTransactions = useCallback(
     (
@@ -88,10 +95,43 @@ export function useTransactions(
           fromAddress: tx.fromAddress,
           toAddress: tx.toAddress,
           txHash: tx.txHash,
+          status: tx.status,
         };
       });
     },
     []
+  );
+
+  // 거래 상태 업데이트 함수
+  const updateTransactionStatus = useCallback(
+    async (transactionId: string, status: "APPROVED" | "REJECTED", storeWalletAddress: string): Promise<boolean> => {
+      try {
+        const response = await fetch(`/api/transactions/${transactionId}`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            status,
+            storeWalletAddress,
+          }),
+        });
+
+        if (response.ok) {
+          // 성공 시 데이터 다시 가져오기
+          refetch();
+          return true;
+        } else {
+          const errorData = await response.json();
+          console.error("Failed to update transaction status:", errorData.error);
+          return false;
+        }
+      } catch (error) {
+        console.error("Error updating transaction status:", error);
+        return false;
+      }
+    },
+    [refetch]
   );
 
   const transformedTransactions =
@@ -105,6 +145,7 @@ export function useTransactions(
     isLoading,
     error,
     refetch,
+    updateTransactionStatus,
   };
 }
 
@@ -117,6 +158,11 @@ interface UseInfiniteTransactionsReturn {
   error: any;
   loadMore: () => void;
   refetch: () => void;
+  updateTransactionStatus: (
+    transactionId: string,
+    status: "APPROVED" | "REJECTED",
+    storeWalletAddress: string
+  ) => Promise<boolean>;
 }
 
 export function useInfiniteTransactions(
@@ -167,8 +213,41 @@ export function useInfiniteTransactions(
           fromAddress: tx.fromAddress,
           toAddress: tx.toAddress,
           txHash: tx.txHash,
+          status: tx.status,
         };
       });
+    },
+    []
+  );
+
+  // 거래 상태 업데이트 함수
+  const updateTransactionStatus = useCallback(
+    async (transactionId: string, status: "APPROVED" | "REJECTED", storeWalletAddress: string): Promise<boolean> => {
+      try {
+        const response = await fetch(`/api/transactions/${transactionId}`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            status,
+            storeWalletAddress,
+          }),
+        });
+
+        if (response.ok) {
+          // 성공 시 로컬 상태 업데이트
+          setTransactions((prev) => prev.map((tx) => (tx.id === transactionId ? { ...tx, status } : tx)));
+          return true;
+        } else {
+          const errorData = await response.json();
+          console.error("Failed to update transaction status:", errorData.error);
+          return false;
+        }
+      } catch (error) {
+        console.error("Error updating transaction status:", error);
+        return false;
+      }
     },
     []
   );
@@ -252,5 +331,6 @@ export function useInfiniteTransactions(
     error,
     loadMore,
     refetch,
+    updateTransactionStatus,
   };
 }

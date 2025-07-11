@@ -43,11 +43,19 @@ model Store {
   @@map("stores")
 }
 
+// 거래 상태 열거형
+enum TransactionStatus {
+  PENDING // 보류 (기본값)
+  APPROVED // 승인
+  REJECTED // 거절
+}
+
 // 거래내역
 model Transaction {
-  id     Int     @id @default(autoincrement())
-  amount Decimal @db.Decimal(20, 9) // 거래 금액 (SUI 단위)
-  txHash String  @unique // 트랜잭션 해시
+  id     Int               @id @default(autoincrement())
+  amount Decimal           @db.Decimal(20, 9) // 거래 금액 (SUI 단위)
+  txHash String            @unique // 트랜잭션 해시
+  status TransactionStatus @default(PENDING) // 거래 상태
 
   // 거래 관계 설정
   consumer   Consumer @relation(fields: [consumerId], references: [id])

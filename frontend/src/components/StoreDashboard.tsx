@@ -22,6 +22,7 @@ const StoreDashboard: React.FC<StoreDashboardProps> = ({ user, onShowQRCode }) =
     transactions: recentTransactions,
     isLoading: transactionsLoading,
     refetch,
+    updateTransactionStatus,
   } = useTransactions(user?.walletAddress || null, "store");
   useEffect(() => {
     if (!user?.walletAddress) return;
@@ -70,6 +71,9 @@ const StoreDashboard: React.FC<StoreDashboardProps> = ({ user, onShowQRCode }) =
           emptyMessage={transactionsLoading ? "트랜잭션을 불러오는 중..." : "아직 거래 내역이 없습니다"}
           maxItems={3}
           onCardClick={() => router.push("/store/transactions")}
+          userType="store"
+          storeWalletAddress={user?.walletAddress}
+          onUpdateTransactionStatus={updateTransactionStatus}
         />
       </div>
     </div>

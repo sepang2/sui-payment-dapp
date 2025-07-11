@@ -106,7 +106,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Store not found" }, { status: 404 });
     }
 
-    // Transaction 저장
+    // Transaction 저장 (기본 상태: PENDING)
     const transaction = await prisma.transaction.create({
       data: {
         amount: parseFloat(amount),
@@ -115,6 +115,7 @@ export async function POST(request: NextRequest) {
         storeId: store.id,
         fromAddress,
         toAddress,
+        status: "PENDING", // 새 거래는 항상 보류 상태로 시작
       },
       include: {
         consumer: {
