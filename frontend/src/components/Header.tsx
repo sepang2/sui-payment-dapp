@@ -3,6 +3,8 @@
 import React, { useState } from "react";
 import { ConnectButton } from "@mysten/dapp-kit";
 import { useDarkMode } from "../contexts/DarkModeContext";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 interface HeaderProps {
   walletConnected: boolean;
@@ -13,6 +15,14 @@ const Header: React.FC<HeaderProps> = ({ walletConnected, walletAddress }) => {
   const [showDisconnect, setShowDisconnect] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
   const { isDarkMode, toggleDarkMode } = useDarkMode();
+
+  const pathname = usePathname();
+  let homePath = "/";
+  if (pathname.startsWith("/consumer")) {
+    homePath = "/consumer/home";
+  } else if (pathname.startsWith("/store")) {
+    homePath = "/store/home";
+  }
 
   const formatWalletAddress = (address: string) => {
     return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
@@ -90,7 +100,9 @@ const Header: React.FC<HeaderProps> = ({ walletConnected, walletAddress }) => {
       <div className="flex justify-center">
         <div className="w-full max-w-md px-2 py-3 flex justify-between items-center relative">
           <div className="flex items-center">
-            <h1 className="text-xl font-bold text-gray-800 dark:text-white pl-2">DSRV x Sui</h1>
+            <Link href={homePath}>
+              <h1 className="text-xl font-bold text-gray-800 dark:text-white pl-2">DSRV x Sui</h1>
+            </Link>
           </div>
           <div className="flex items-center space-x-3">
             {/* 다크모드 토글 버튼 */}
