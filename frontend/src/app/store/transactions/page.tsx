@@ -288,6 +288,17 @@ export default function StoreTransactionsPage() {
                               : `from: ${formatAddress(transaction.fromAddress)}`}
                           </p>
                           <p className="text-sm text-gray-500 dark:text-gray-400">{transaction.timestamp}</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                          <a
+                              href={`https://suiscan.xyz/testnet/tx/${transaction.txHash}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 hover:underline"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              트랜잭션 해시: {formatAddress(transaction.txHash)}
+                            </a>
+                          </p>
                         </div>
                       </div>
                       <div className="text-right ml-4">
