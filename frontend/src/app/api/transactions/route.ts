@@ -10,6 +10,8 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const walletAddress = searchParams.get("walletAddress");
     const userType = searchParams.get("userType"); // "consumer" or "store"
+    const offset = parseInt(searchParams.get("offset") || "0");
+    const limit = parseInt(searchParams.get("limit") || "10");
 
     if (!walletAddress || !userType) {
       return NextResponse.json({ error: "Wallet address and user type are required" }, { status: 400 });
@@ -38,6 +40,8 @@ export async function GET(request: NextRequest) {
           },
         },
         orderBy: { createdAt: "desc" },
+        skip: offset,
+        take: limit,
       });
     } else if (userType === "store") {
       // Store의 거래 내역 조회
@@ -60,6 +64,8 @@ export async function GET(request: NextRequest) {
           },
         },
         orderBy: { createdAt: "desc" },
+        skip: offset,
+        take: limit,
       });
     } else {
       return NextResponse.json({ error: "Invalid user type. Must be 'consumer' or 'store'" }, { status: 400 });

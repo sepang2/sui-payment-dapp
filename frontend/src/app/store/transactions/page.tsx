@@ -1,77 +1,39 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { motion } from "framer-motion";
 import { useStoreAuth } from "../../../hooks/useAuth";
+import { useInfiniteTransactions } from "../../../hooks/useTransactions";
+import { useInfiniteScroll } from "../../../hooks/useInfiniteScroll";
 import Header from "../../../components/Header";
 import StoreBottomNavigation from "../../../components/StoreBottomNavigation";
 import { EXCHANGE_RATE } from "../../../utils/constants";
-import { listVariants, itemVariants } from "../../../utils/animations";
-
-interface Transaction {
-  id: string;
-  type: "send" | "receive";
-  amount: number;
-  toAddress?: string;
-  fromAddress?: string;
-  description: string;
-  timestamp: string;
-  txHash: string;
-}
+import { itemVariants } from "../../../utils/animations";
 
 export default function StoreTransactionsPage() {
-  const { isLoading, user, isAuthenticated } = useStoreAuth();
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { isLoading: authLoading, user, isAuthenticated } = useStoreAuth();
   const exchangeRate = EXCHANGE_RATE;
 
-  // 거래 내역 조회
-  useEffect(() => {
-    const fetchTransactions = async () => {
-      if (!user?.walletAddress) return;
+  const { transactions, isLoading, isLoadingMore, hasMore, error, loadMore } = useInfiniteTransactions(
+    user?.walletAddress || null,
+    "store",
+    7, // 초기 로드 7개
+    5 // 추가 로드 5개
+  );
 
-      try {
-        setLoading(true);
-        const response = await fetch(`/api/transactions?walletAddress=${user.walletAddress}&userType=store`);
-
-        if (response.ok) {
-          const { transactions: dbTransactions } = await response.json();
-
-          // DB 데이터를 UI 형식으로 변환
-          const formattedTransactions: Transaction[] = dbTransactions.map((tx: any) => ({
-            id: tx.id.toString(),
-            type: "receive" as const, // Store는 항상 receive (매출)
-            amount: parseFloat(tx.amount),
-            toAddress: tx.toAddress,
-            fromAddress: tx.fromAddress,
-            description: tx.consumer?.name || "Unknown Customer",
-            timestamp: tx.createdAt, // ISO 문자열로 저장
-            txHash: tx.txHash,
-          }));
-
-          setTransactions(formattedTransactions);
-        } else {
-          console.error("Failed to fetch transactions");
-          setTransactions([]);
-        }
-      } catch (error) {
-        console.error("Error fetching transactions:", error);
-        setTransactions([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (isAuthenticated && user) {
-      fetchTransactions();
-    }
-  }, [isAuthenticated, user]);
+  // 무한스크롤 설정
+  useInfiniteScroll({
+    hasMore,
+    isLoading: isLoadingMore,
+    onLoadMore: loadMore,
+    threshold: 200,
+  });
 
   // 오늘의 매출 계산
   const today = new Date().toISOString().split("T")[0];
   const todayTransactions = transactions.filter((tx) => {
     try {
-      const txDate = new Date(tx.timestamp);
+      const txDate = new Date(tx.rawTimestamp);
       if (isNaN(txDate.getTime())) {
         return false; // 유효하지 않은 날짜는 제외
       }
@@ -119,12 +81,27 @@ export default function StoreTransactionsPage() {
     }
   };
 
-  if (loading || isLoading) {
+  if (authLoading || isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <Header walletConnected={isAuthenticated} walletAddress={user?.walletAddress} />
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+        </div>
+        <StoreBottomNavigation visible={true} />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <Header walletConnected={isAuthenticated} walletAddress={user?.walletAddress} />
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <i className="fas fa-exclamation-triangle text-4xl text-red-500 mb-4"></i>
+            <p className="text-red-500 dark:text-red-400">거래 내역을 불러오는데 실패했습니다.</p>
+          </div>
         </div>
         <StoreBottomNavigation visible={true} />
       </div>
@@ -164,17 +141,14 @@ export default function StoreTransactionsPage() {
             <p className="text-gray-500 dark:text-gray-400">거래 내역이 없습니다.</p>
           </div>
         ) : (
-          <motion.div
-            className="space-y-3"
-            variants={listVariants}
-            initial="hidden"
-            animate="visible"
-            key={transactions.length}
-          >
-            {transactions.map((transaction) => (
+          <div className="space-y-3">
+            {transactions.map((transaction, index) => (
               <motion.div
                 key={transaction.id}
                 variants={itemVariants}
+                initial="hidden"
+                animate="visible"
+                transition={{ delay: index * 0.1 }}
                 className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4"
               >
                 <div className="flex items-center justify-between">
@@ -219,7 +193,21 @@ export default function StoreTransactionsPage() {
                 </div>
               </motion.div>
             ))}
-          </motion.div>
+
+            {/* 로딩 인디케이터 */}
+            {isLoadingMore && (
+              <div className="flex justify-center py-4">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+              </div>
+            )}
+
+            {/* 더 이상 불러올 데이터가 없을 때 */}
+            {!hasMore && transactions.length > 0 && (
+              <div className="text-center py-4">
+                <p className="text-gray-500 dark:text-gray-400 text-sm">모든 거래 내역을 불러왔습니다.</p>
+              </div>
+            )}
+          </div>
         )}
       </div>
       <StoreBottomNavigation visible={true} />

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useState, useEffect } from "react";
 import useSWR from "swr";
 
 interface Transaction {
@@ -12,6 +12,7 @@ interface Transaction {
   rawTimestamp: string; // ISO 날짜 형식으로 날짜 비교용
   fromAddress?: string;
   toAddress?: string;
+  txHash: string;
 }
 
 interface ApiTransaction {
@@ -86,6 +87,7 @@ export function useTransactions(
           rawTimestamp: createdDate.toISOString(),
           fromAddress: tx.fromAddress,
           toAddress: tx.toAddress,
+          txHash: tx.txHash,
         };
       });
     },
@@ -102,6 +104,153 @@ export function useTransactions(
     allTransactions: transformedTransactions,
     isLoading,
     error,
+    refetch,
+  };
+}
+
+// 새로운 무한 스크롤 훅
+interface UseInfiniteTransactionsReturn {
+  transactions: Transaction[];
+  isLoading: boolean;
+  isLoadingMore: boolean;
+  hasMore: boolean;
+  error: any;
+  loadMore: () => void;
+  refetch: () => void;
+}
+
+export function useInfiniteTransactions(
+  walletAddress: string | null,
+  userType: "consumer" | "store" | null,
+  initialLimit: number = 7,
+  loadMoreLimit: number = 5
+): UseInfiniteTransactionsReturn {
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [offset, setOffset] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [error, setError] = useState<any>(null);
+
+  const transformApiTransactions = useCallback(
+    (
+      apiTransactions: ApiTransaction[],
+      currentUserType: "consumer" | "store",
+      currentWalletAddress: string
+    ): Transaction[] => {
+      return apiTransactions.map((tx) => {
+        const isCurrentUserSender = tx.fromAddress === currentWalletAddress;
+        const type = isCurrentUserSender ? "send" : "receive";
+
+        let description = "";
+        if (currentUserType === "consumer") {
+          description = tx.store?.name ? `${tx.store.name}` : "상점 이름";
+        } else {
+          description = tx.consumer?.name ? `${tx.consumer.name}` : "고객 이름";
+        }
+
+        const createdDate = new Date(tx.createdAt);
+
+        return {
+          id: tx.id.toString(),
+          type,
+          amount: parseFloat(tx.amount),
+          description,
+          timestamp: createdDate.toLocaleString("ko-KR", {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+          rawTimestamp: createdDate.toISOString(),
+          fromAddress: tx.fromAddress,
+          toAddress: tx.toAddress,
+          txHash: tx.txHash,
+        };
+      });
+    },
+    []
+  );
+
+  const fetchTransactions = useCallback(
+    async (skip: number, take: number, isInitial: boolean = false) => {
+      if (!walletAddress || !userType) return;
+
+      try {
+        if (isInitial) {
+          setIsLoading(true);
+        } else {
+          setIsLoadingMore(true);
+        }
+
+        const url = `/api/transactions?walletAddress=${encodeURIComponent(
+          walletAddress
+        )}&userType=${userType}&offset=${skip}&limit=${take}`;
+
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (response.ok) {
+          const newTransactions = transformApiTransactions(data.transactions || [], userType, walletAddress);
+
+          if (isInitial) {
+            setTransactions(newTransactions);
+            setOffset(newTransactions.length);
+          } else {
+            setTransactions((prev) => [...prev, ...newTransactions]);
+            setOffset((prev) => prev + newTransactions.length);
+          }
+
+          // 더 불러올 데이터가 있는지 확인
+          setHasMore(newTransactions.length === take);
+        } else {
+          setError(data.error || "Failed to fetch transactions");
+        }
+      } catch (err) {
+        setError(err);
+      } finally {
+        setIsLoading(false);
+        setIsLoadingMore(false);
+      }
+    },
+    [walletAddress, userType, transformApiTransactions]
+  );
+
+  // 초기 로드
+  useEffect(() => {
+    if (walletAddress && userType) {
+      setTransactions([]);
+      setOffset(0);
+      setHasMore(true);
+      setError(null);
+      fetchTransactions(0, initialLimit, true);
+    }
+  }, [walletAddress, userType, initialLimit, fetchTransactions]);
+
+  const loadMore = useCallback(() => {
+    if (!isLoadingMore && hasMore) {
+      fetchTransactions(offset, loadMoreLimit, false);
+    }
+  }, [fetchTransactions, offset, loadMoreLimit, isLoadingMore, hasMore]);
+
+  const refetch = useCallback(() => {
+    if (walletAddress && userType) {
+      setTransactions([]);
+      setOffset(0);
+      setHasMore(true);
+      setError(null);
+      fetchTransactions(0, initialLimit, true);
+    }
+  }, [walletAddress, userType, initialLimit, fetchTransactions]);
+
+  return {
+    transactions,
+    isLoading,
+    isLoadingMore,
+    hasMore,
+    error,
+    loadMore,
     refetch,
   };
 }

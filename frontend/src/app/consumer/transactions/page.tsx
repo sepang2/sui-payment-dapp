@@ -1,76 +1,32 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { motion } from "framer-motion";
 import { useConsumerAuth } from "../../../hooks/useAuth";
+import { useInfiniteTransactions } from "../../../hooks/useTransactions";
+import { useInfiniteScroll } from "../../../hooks/useInfiniteScroll";
 import Header from "../../../components/Header";
 import ConsumerBottomNavigation from "../../../components/ConsumerBottomNavigation";
 import { EXCHANGE_RATE } from "../../../utils/constants";
-import { listVariants, itemVariants } from "../../../utils/animations";
-
-interface Transaction {
-  id: string;
-  type: "send" | "receive";
-  amount: number;
-  toAddress?: string;
-  fromAddress?: string;
-  description: string;
-  timestamp: string;
-  txHash: string;
-}
+import { itemVariants } from "../../../utils/animations";
 
 export default function ConsumerTransactionsPage() {
-  const { isLoading, user, isAuthenticated } = useConsumerAuth();
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { isLoading: authLoading, user, isAuthenticated } = useConsumerAuth();
 
-  // 거래 내역 조회
-  useEffect(() => {
-    const fetchTransactions = async () => {
-      if (!user?.walletAddress) return;
+  const { transactions, isLoading, isLoadingMore, hasMore, error, loadMore } = useInfiniteTransactions(
+    user?.walletAddress || null,
+    "consumer",
+    7, // 초기 로드 7개
+    5 // 추가 로드 5개
+  );
 
-      try {
-        setLoading(true);
-        const response = await fetch(`/api/transactions?walletAddress=${user.walletAddress}&userType=consumer`);
-
-        if (response.ok) {
-          const { transactions: dbTransactions } = await response.json();
-
-          // DB 데이터를 UI 형식으로 변환
-          const formattedTransactions: Transaction[] = dbTransactions.map((tx: any) => ({
-            id: tx.id.toString(),
-            type: "send" as const, // Consumer는 항상 send (결제)
-            amount: parseFloat(tx.amount),
-            toAddress: tx.toAddress,
-            fromAddress: tx.fromAddress,
-            description: tx.store?.name || "Unknown Store",
-            timestamp: new Date(tx.createdAt).toLocaleString("ko-KR", {
-              year: "numeric",
-              month: "2-digit",
-              day: "2-digit",
-              hour: "2-digit",
-              minute: "2-digit",
-            }),
-            txHash: tx.txHash,
-          }));
-
-          setTransactions(formattedTransactions);
-        } else {
-          console.error("Failed to fetch transactions");
-          setTransactions([]);
-        }
-      } catch (error) {
-        console.error("Error fetching transactions:", error);
-        setTransactions([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (isAuthenticated && user) {
-      fetchTransactions();
-    }
-  }, [isAuthenticated, user]);
+  // 무한스크롤 설정
+  useInfiniteScroll({
+    hasMore,
+    isLoading: isLoadingMore,
+    onLoadMore: loadMore,
+    threshold: 200,
+  });
 
   const getTransactionIcon = (type: string) => {
     if (type === "send") return "fas fa-arrow-up text-red-500";
@@ -85,12 +41,27 @@ export default function ConsumerTransactionsPage() {
     return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
   };
 
-  if (loading || isLoading) {
+  if (authLoading || isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <Header walletConnected={isAuthenticated} walletAddress={user?.walletAddress} />
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+        </div>
+        <ConsumerBottomNavigation visible={true} />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <Header walletConnected={isAuthenticated} walletAddress={user?.walletAddress} />
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <i className="fas fa-exclamation-triangle text-4xl text-red-500 mb-4"></i>
+            <p className="text-red-500 dark:text-red-400">거래 내역을 불러오는데 실패했습니다.</p>
+          </div>
         </div>
         <ConsumerBottomNavigation visible={true} />
       </div>
@@ -109,17 +80,14 @@ export default function ConsumerTransactionsPage() {
             <p className="text-gray-500 dark:text-gray-400">거래 내역이 없습니다.</p>
           </div>
         ) : (
-          <motion.div
-            className="space-y-3"
-            variants={listVariants}
-            initial="hidden"
-            animate="visible"
-            key={transactions.length} // 데이터 변경 시 애니메이션 재실행
-          >
-            {transactions.map((transaction) => (
+          <div className="space-y-3">
+            {transactions.map((transaction, index) => (
               <motion.div
                 key={transaction.id}
                 variants={itemVariants}
+                initial="hidden"
+                animate="visible"
+                transition={{ delay: index * 0.1 }}
                 className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4"
               >
                 <div className="flex items-center justify-between">
@@ -164,7 +132,21 @@ export default function ConsumerTransactionsPage() {
                 </div>
               </motion.div>
             ))}
-          </motion.div>
+
+            {/* 로딩 인디케이터 */}
+            {isLoadingMore && (
+              <div className="flex justify-center py-4">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+              </div>
+            )}
+
+            {/* 더 이상 불러올 데이터가 없을 때 */}
+            {!hasMore && transactions.length > 0 && (
+              <div className="text-center py-4">
+                <p className="text-gray-500 dark:text-gray-400 text-sm">모든 거래 내역을 불러왔습니다.</p>
+              </div>
+            )}
+          </div>
         )}
       </div>
       <ConsumerBottomNavigation visible={true} />
