@@ -69,7 +69,8 @@ const TransactionList: React.FC<TransactionListProps> = ({
   const getTransactionIcon = (type: string, status: string) => {
     if (status === "PENDING") return "fas fa-clock text-yellow-500";
     if (status === "APPROVED") {
-      return type === "send" ? "fas fa-arrow-up text-red-500" : "fas fa-arrow-down text-green-500";
+      return "fas fa-check text-green-500";
+      // return type === "send" ? "fas fa-arrow-up text-red-500" : "fas fa-arrow-down text-green-500";
     }
     if (status === "REJECTED") return "fas fa-times text-red-500";
     return "fas fa-question text-gray-500";
@@ -79,32 +80,6 @@ const TransactionList: React.FC<TransactionListProps> = ({
     if (status === "PENDING") return "text-yellow-500 dark:text-yellow-400";
     if (status === "REJECTED") return "text-gray-500 dark:text-gray-400";
     return type === "send" ? "text-red-500 dark:text-red-400" : "text-green-500 dark:text-green-400";
-  };
-
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case "PENDING":
-        return "보류";
-      case "APPROVED":
-        return "승인";
-      case "REJECTED":
-        return "거절";
-      default:
-        return "알 수 없음";
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "PENDING":
-        return "text-yellow-600 bg-yellow-100 dark:text-yellow-400 dark:bg-yellow-900";
-      case "APPROVED":
-        return "text-green-600 bg-green-100 dark:text-green-400 dark:bg-green-900";
-      case "REJECTED":
-        return "text-red-600 bg-red-100 dark:text-red-400 dark:bg-red-900";
-      default:
-        return "text-gray-600 bg-gray-100 dark:text-gray-400 dark:bg-gray-900";
-    }
   };
 
   const formatAddress = (address: string | undefined) => {
@@ -169,11 +144,6 @@ const TransactionList: React.FC<TransactionListProps> = ({
                 <div className="flex-1">
                   <div className="flex items-center justify-between mb-1">
                     <p className="font-medium text-gray-900 dark:text-white">{transaction.description}</p>
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(transaction.status)}`}
-                    >
-                      {getStatusText(transaction.status)}
-                    </span>
                   </div>
                   <p className="text-xs text-gray-400 mb-1">
                     {transaction.type === "send"
