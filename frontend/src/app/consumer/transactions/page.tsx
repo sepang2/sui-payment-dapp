@@ -1,10 +1,12 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import { useConsumerAuth } from "../../../hooks/useAuth";
 import Header from "../../../components/Header";
 import ConsumerBottomNavigation from "../../../components/ConsumerBottomNavigation";
 import { EXCHANGE_RATE } from "../../../utils/constants";
+import { listVariants, itemVariants } from "../../../utils/animations";
 
 interface Transaction {
   id: string;
@@ -107,9 +109,19 @@ export default function ConsumerTransactionsPage() {
             <p className="text-gray-500 dark:text-gray-400">거래 내역이 없습니다.</p>
           </div>
         ) : (
-          <div className="space-y-3">
+          <motion.div
+            className="space-y-3"
+            variants={listVariants}
+            initial="hidden"
+            animate="visible"
+            key={transactions.length} // 데이터 변경 시 애니메이션 재실행
+          >
             {transactions.map((transaction) => (
-              <div key={transaction.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
+              <motion.div
+                key={transaction.id}
+                variants={itemVariants}
+                className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4"
+              >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
                     <div className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center mr-3">
@@ -150,9 +162,9 @@ export default function ConsumerTransactionsPage() {
                     </p>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         )}
       </div>
       <ConsumerBottomNavigation visible={true} />

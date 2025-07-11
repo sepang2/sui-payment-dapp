@@ -1,9 +1,11 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import { useConsumerAuth } from "../../../hooks/useAuth";
 import Header from "../../../components/Header";
 import ConsumerBottomNavigation from "../../../components/ConsumerBottomNavigation";
+import { listVariants, itemVariants } from "../../../utils/animations";
 
 interface LumaLink {
   id: string;
@@ -116,10 +118,17 @@ export default function ConsumerExplorePage() {
             <p className="text-gray-500 dark:text-gray-400">등록된 이벤트가 없습니다.</p>
           </div>
         ) : (
-          <div className="space-y-4">
+          <motion.div
+            className="space-y-4"
+            variants={listVariants}
+            initial="hidden"
+            animate="visible"
+            key={lumaLinks.length}
+          >
             {lumaLinks.map((link) => (
-              <div
+              <motion.div
                 key={link.id}
+                variants={itemVariants}
                 className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
                 onClick={() => handleLinkClick(link.lumaLink)}
               >
@@ -174,9 +183,9 @@ export default function ConsumerExplorePage() {
                     <i className="fas fa-chevron-right text-gray-400 dark:text-gray-500"></i>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         )}
       </div>
       <ConsumerBottomNavigation visible={true} />

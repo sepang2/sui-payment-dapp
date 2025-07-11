@@ -1,9 +1,11 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import { useStoreAuth } from "../../../hooks/useAuth";
 import Header from "../../../components/Header";
 import StoreBottomNavigation from "../../../components/StoreBottomNavigation";
+import { itemVariants } from "../../../utils/animations";
 
 interface User {
   id: string;
@@ -194,7 +196,12 @@ export default function StoreProfilePage() {
         )}
 
         {user && (
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
+          <motion.div
+            className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6"
+            variants={itemVariants}
+            initial="hidden"
+            animate="visible"
+          >
             <div className="space-y-4">
               <div>
                 <label className="block text-xs font-semibold text-indigo-600 dark:text-indigo-400 mb-2 uppercase tracking-wide">
@@ -240,7 +247,7 @@ export default function StoreProfilePage() {
 
               <div>
                 <label className="block text-xs font-semibold text-indigo-600 dark:text-indigo-400 mb-2 uppercase tracking-wide">
-                  Luma 이벤트 URL
+                  이벤트
                 </label>
                 {editing ? (
                   <input
@@ -309,7 +316,7 @@ export default function StoreProfilePage() {
                 </button>
               </div>
             )}
-          </div>
+          </motion.div>
         )}
       </div>
       <StoreBottomNavigation visible={true} />
