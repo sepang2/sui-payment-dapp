@@ -103,7 +103,7 @@
   "all": "All",
   "no_transactions_found": "No transactions found.",
   "no_filtered_transactions": "No {{status}} transactions.",
-  "transaction_hash": "Transaction Hash:",
+  "transaction_hash": "Transaction Hash",
   "all_transactions_loaded": "All transactions loaded.",
   "store_dashboard_title": "{{name}} Store Dashboard",
   "show_qr_code": "Show QR Code",

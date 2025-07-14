@@ -103,7 +103,7 @@
   "all": "전체",
   "no_transactions_found": "거래 내역이 없습니다.",
   "no_filtered_transactions": "{{status}}된 거래가 없습니다.",
-  "transaction_hash": "트랜잭션 해시:",
+  "transaction_hash": "트랜잭션 해시",
   "all_transactions_loaded": "모든 거래 내역을 불러왔습니다.",
   "store_dashboard_title": "{{name}} 상점 대시보드",
   "show_qr_code": "QR 코드 표시",
