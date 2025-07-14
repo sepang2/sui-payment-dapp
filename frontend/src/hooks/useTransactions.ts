@@ -55,7 +55,7 @@ export function useTransactions(
 ): UseTransactionsReturn {
   const apiUrl =
     walletAddress && userType
-      ? `/api/transactions?walletAddress=${encodeURIComponent(walletAddress)}&userType=${userType}`
+      ? `/api/transactions?walletAddress=${encodeURIComponent(walletAddress)}&userType=${userType}&limit=999`
       : null;
 
   const { data, error, isLoading, mutate: refetch } = useSWR(apiUrl, fetcher);
