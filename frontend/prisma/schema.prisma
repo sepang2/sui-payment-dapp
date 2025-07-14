@@ -52,10 +52,11 @@ enum TransactionStatus {
 
 // 거래내역
 model Transaction {
-  id     Int               @id @default(autoincrement())
-  amount Decimal           @db.Decimal(20, 9) // 거래 금액 (SUI 단위)
-  txHash String            @unique // 트랜잭션 해시
-  status TransactionStatus @default(PENDING) // 거래 상태
+  id           Int               @id @default(autoincrement())
+  amount       Decimal           @db.Decimal(20, 9) // 거래 금액 (SUI 단위)
+  txHash       String            @unique // 트랜잭션 해시
+  refundTxHash String?           @unique // 환불 트랜잭션 해시
+  status       TransactionStatus @default(PENDING) // 거래 상태
 
   // 거래 관계 설정
   consumer   Consumer @relation(fields: [consumerId], references: [id])

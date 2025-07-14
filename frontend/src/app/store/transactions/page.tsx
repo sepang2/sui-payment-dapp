@@ -289,7 +289,7 @@ export default function StoreTransactionsPage() {
                           </p>
                           <p className="text-sm text-gray-500 dark:text-gray-400">{transaction.timestamp}</p>
                           <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                          <a
+                            <a
                               href={`https://suiscan.xyz/testnet/tx/${transaction.txHash}`}
                               target="_blank"
                               rel="noopener noreferrer"
