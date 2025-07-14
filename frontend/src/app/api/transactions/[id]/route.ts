@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
+import { notifyTransactionStatusUpdate } from "../sseClients";
 
 const prisma = new PrismaClient();
 
@@ -82,6 +83,11 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
         },
       },
     });
+
+    // Consumer에게 SSE 알림 전송
+    if (updatedTransaction.consumer?.walletAddress) {
+      notifyTransactionStatusUpdate(updatedTransaction, updatedTransaction.consumer.walletAddress);
+    }
 
     return NextResponse.json({
       message: `Transaction ${status.toLowerCase()} successfully`,

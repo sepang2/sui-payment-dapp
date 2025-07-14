@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useCurrentAccount } from "@mysten/dapp-kit";
 import { EXCHANGE_RATE } from "../utils/constants";
 import { useTransactions } from "../hooks/useTransactions";
@@ -26,7 +26,31 @@ const ConsumerDashboard: React.FC<ConsumerDashboardProps> = ({ balance, balanceL
     transactions: recentTransactions,
     // allTransactions,
     isLoading: transactionsLoading,
+    refetch,
   } = useTransactions(account?.address || null, "consumer");
+
+  // SSE 구독 - 트랜잭션 상태 업데이트 실시간 수신
+  useEffect(() => {
+    if (!account?.address) return;
+
+    const eventSource = new EventSource(
+      `/api/transactions/stream?walletAddress=${encodeURIComponent(account.address)}&userType=consumer`
+    );
+
+    eventSource.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data.type === "transaction_status_update") {
+        // 트랜잭션 상태가 업데이트되었을 때 목록 새로고침
+        refetch();
+      }
+    };
+
+    eventSource.onerror = (error) => {
+      console.error("SSE connection error:", error);
+    };
+
+    return () => eventSource.close();
+  }, [account?.address, refetch]);
 
   // // 오늘의 결제 계산 (전체 트랜잭션 기준) - 오히려 노출되면 소비 심리 위축될 수 있음
   // const today = new Date().toISOString().split("T")[0];

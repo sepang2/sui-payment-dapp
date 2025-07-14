@@ -26,7 +26,9 @@ const StoreDashboard: React.FC<StoreDashboardProps> = ({ user, onShowQRCode }) =
   } = useTransactions(user?.walletAddress || null, "store");
   useEffect(() => {
     if (!user?.walletAddress) return;
-    const eventSource = new EventSource("/api/transactions/stream");
+    const eventSource = new EventSource(
+      `/api/transactions/stream?walletAddress=${encodeURIComponent(user.walletAddress)}&userType=store`
+    );
     eventSource.onmessage = (event) => {
       refetch();
     };

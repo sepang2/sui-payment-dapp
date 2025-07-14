@@ -17,7 +17,7 @@ export default function ConsumerTransactionsPage() {
   const [previousCount, setPreviousCount] = useState(0);
   const exchangeRate = EXCHANGE_RATE;
 
-  const { transactions, isLoading, isLoadingMore, hasMore, error, loadMore } = useInfiniteTransactions(
+  const { transactions, isLoading, isLoadingMore, hasMore, error, loadMore, refetch } = useInfiniteTransactions(
     user?.walletAddress || null,
     "consumer",
     7, // 초기 로드 7개
@@ -32,6 +32,29 @@ export default function ConsumerTransactionsPage() {
     threshold: 200,
     loadDelay: 1500, // 1.5초 딜레이
   });
+
+  // SSE 구독 - 트랜잭션 상태 업데이트 실시간 수신
+  useEffect(() => {
+    if (!user?.walletAddress) return;
+    
+    const eventSource = new EventSource(
+      `/api/transactions/stream?walletAddress=${encodeURIComponent(user.walletAddress)}&userType=consumer`
+    );
+    
+    eventSource.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data.type === "transaction_status_update") {
+        // 트랜잭션 상태가 업데이트되었을 때 목록 새로고침
+        refetch();
+      }
+    };
+    
+    eventSource.onerror = (error) => {
+      console.error("SSE connection error:", error);
+    };
+    
+    return () => eventSource.close();
+  }, [user?.walletAddress, refetch]);
 
   // 상태별 필터링
   const filteredTransactions = transactions.filter((transaction) => {
