@@ -12,6 +12,7 @@ export async function GET(request: NextRequest) {
     const userType = searchParams.get("userType"); // "consumer" or "store"
     const offset = parseInt(searchParams.get("offset") || "0");
     const limit = parseInt(searchParams.get("limit") || "10");
+    const status = searchParams.get("status");
 
     if (!walletAddress || !userType) {
       return NextResponse.json({ error: "Wallet address and user type are required" }, { status: 400 });
@@ -30,7 +31,10 @@ export async function GET(request: NextRequest) {
       }
 
       transactions = await prisma.transaction.findMany({
-        where: { consumerId: consumer.id },
+        where: {
+          consumerId: consumer.id,
+          ...(status ? { status } : {}),
+        },
         include: {
           store: {
             select: {
@@ -54,7 +58,10 @@ export async function GET(request: NextRequest) {
       }
 
       transactions = await prisma.transaction.findMany({
-        where: { storeId: store.id },
+        where: {
+          storeId: store.id,
+          ...(status ? { status } : {}),
+        },
         include: {
           consumer: {
             select: {

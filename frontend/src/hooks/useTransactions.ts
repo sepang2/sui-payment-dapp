@@ -169,7 +169,8 @@ export function useInfiniteTransactions(
   walletAddress: string | null,
   userType: "consumer" | "store" | null,
   initialLimit: number = 7,
-  loadMoreLimit: number = 5
+  loadMoreLimit: number = 5,
+  status?: "ALL" | "PENDING" | "APPROVED" | "REJECTED"
 ): UseInfiniteTransactionsReturn {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [offset, setOffset] = useState(0);
@@ -263,9 +264,12 @@ export function useInfiniteTransactions(
           setIsLoadingMore(true);
         }
 
-        const url = `/api/transactions?walletAddress=${encodeURIComponent(
+        let url = `/api/transactions?walletAddress=${encodeURIComponent(
           walletAddress
         )}&userType=${userType}&offset=${skip}&limit=${take}`;
+        if (status && status !== "ALL") {
+          url += `&status=${status}`;
+        }
 
         const response = await fetch(url);
         const data = await response.json();
@@ -293,7 +297,7 @@ export function useInfiniteTransactions(
         setIsLoadingMore(false);
       }
     },
-    [walletAddress, userType, transformApiTransactions]
+    [walletAddress, userType, transformApiTransactions, status]
   );
 
   // 초기 로드
@@ -305,7 +309,7 @@ export function useInfiniteTransactions(
       setError(null);
       fetchTransactions(0, initialLimit, true);
     }
-  }, [walletAddress, userType, initialLimit, fetchTransactions]);
+  }, [walletAddress, userType, initialLimit, status, fetchTransactions]);
 
   const loadMore = useCallback(() => {
     if (!isLoadingMore && hasMore) {
