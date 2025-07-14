@@ -106,7 +106,7 @@ const Header: React.FC<HeaderProps> = ({ walletConnected, walletAddress }) => {
           </div>
           <div className="flex items-center space-x-3">
             {/* 다크모드 토글 버튼 */}
-            <button
+            {/* <button
               onClick={toggleDarkMode}
               className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
               title={isDarkMode ? "라이트 모드로 전환" : "다크 모드로 전환"}
@@ -116,7 +116,7 @@ const Header: React.FC<HeaderProps> = ({ walletConnected, walletAddress }) => {
               ) : (
                 <i className="fas fa-moon text-gray-600 dark:text-gray-400"></i>
               )}
-            </button>
+            </button> */}
             {!walletConnected ? (
               <div className="connect-wallet-container">
                 <ConnectButton />
