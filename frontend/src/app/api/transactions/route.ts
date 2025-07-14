@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, TransactionStatus } from "@prisma/client";
 import { notifyNewTransaction } from "./sseClients";
 
 const prisma = new PrismaClient();
@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
       transactions = await prisma.transaction.findMany({
         where: {
           consumerId: consumer.id,
-          ...(status ? { status } : {}),
+          ...(status ? { status: status as TransactionStatus } : {}),
         },
         include: {
           store: {
@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
       transactions = await prisma.transaction.findMany({
         where: {
           storeId: store.id,
-          ...(status ? { status } : {}),
+          ...(status ? { status: status as TransactionStatus } : {}),
         },
         include: {
           consumer: {
