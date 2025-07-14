@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useCallback, useState } from "react";
 import QrScanner from "qr-scanner";
+import { useTranslation } from "react-i18next";
 
 interface QRScannerProps {
   onCancel: () => void;
@@ -9,6 +10,7 @@ interface QRScannerProps {
 }
 
 const QRScanner: React.FC<QRScannerProps> = ({ onCancel, onScanSuccess }) => {
+  const { t } = useTranslation();
   const videoRef = useRef<HTMLVideoElement>(null);
   const qrScannerRef = useRef<QrScanner | null>(null);
   const [error, setError] = useState<string>("");
@@ -77,7 +79,7 @@ const QRScanner: React.FC<QRScannerProps> = ({ onCancel, onScanSuccess }) => {
       }
     } catch (err) {
       console.error("Error accessing camera: ", err);
-      setError("카메라 접근이 거부되었습니다. 카메라 접근을 허용하고 다시 시도해주세요.");
+      setError(t('camera_access_denied'));
     }
   }, [stopCamera, onScanSuccess]);
 
@@ -111,10 +113,10 @@ const QRScanner: React.FC<QRScannerProps> = ({ onCancel, onScanSuccess }) => {
         await activateCamera();
       } catch (err) {
         console.error("Error accessing camera after permission prompt: ", err);
-        setError("카메라 접근이 거부되었습니다. 다시 시도해주세요.");
+        setError(t('camera_access_denied'));
       }
     } else {
-      setError("카메라 접근이 차단되었습니다. 설정에서 카메라 권한을 허용해주세요.");
+      setError(t('camera_access_blocked'));
     }
   }, [activateCamera, checkCameraPermission]);
 
@@ -176,18 +178,18 @@ const QRScanner: React.FC<QRScannerProps> = ({ onCancel, onScanSuccess }) => {
         <div className="absolute top-0 inset-x-0 p-6 bg-gradient-to-b from-black via-black/50 to-transparent z-30">
           {error ? (
             <>
-              <h2 className="text-white text-center text-xl font-bold drop-shadow-lg">카메라 오류</h2>
+              <h2 className="text-white text-center text-xl font-bold drop-shadow-lg">{t('camera_error')}</h2>
               <p className="text-white text-center text-sm mt-2 opacity-90 drop-shadow-lg">
-                카메라 접근 권한을 확인해주세요
+                {t('check_camera_permission')}
               </p>
             </>
           ) : (
             <>
               <h2 className="text-white text-center text-xl font-bold drop-shadow-lg">
-                QR 코드를 프레임 안에 맞춰주세요
+                {t('align_qr_code')}
               </h2>
               <p className="text-white text-center text-sm mt-2 opacity-90 drop-shadow-lg">
-                카메라가 QR 코드를 자동으로 인식합니다
+                {t('auto_recognize_qr')}
               </p>
             </>
           )}
@@ -202,13 +204,13 @@ const QRScanner: React.FC<QRScannerProps> = ({ onCancel, onScanSuccess }) => {
               onClick={startCamera}
               className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-button font-semibold cursor-pointer shadow-lg"
             >
-              다시 시도
+              {t('retry')}
             </button>
             <button
               onClick={handleCancel}
               className="flex-1 bg-white text-indigo-600 py-3 rounded-button font-semibold cursor-pointer shadow-lg"
             >
-              취소
+              {t('cancel')}
             </button>
           </div>
         ) : (
@@ -216,7 +218,7 @@ const QRScanner: React.FC<QRScannerProps> = ({ onCancel, onScanSuccess }) => {
             onClick={handleCancel}
             className="w-full bg-white text-indigo-600 py-3 rounded-button font-semibold cursor-pointer shadow-lg"
           >
-            취소
+            {t('cancel')}
           </button>
         )}
       </div>

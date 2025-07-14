@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { EXCHANGE_RATE } from "../../utils/constants";
+import { useTranslation } from "react-i18next";
 
 interface Transaction {
   id: string;
@@ -62,6 +63,7 @@ const TransactionList: React.FC<TransactionListProps> = ({
   storeWalletAddress,
   onUpdateTransactionStatus,
 }) => {
+  const { t } = useTranslation();
   const exchangeRate = EXCHANGE_RATE;
   const displayTransactions = transactions.slice(0, maxItems);
   const [processingTxId, setProcessingTxId] = useState<string | null>(null);
@@ -110,7 +112,7 @@ const TransactionList: React.FC<TransactionListProps> = ({
         {title && <h3 className="text-xl font-bold text-gray-700 dark:text-gray-200 mb-4">{title}</h3>}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 text-center">
           <i className="fas fa-receipt text-3xl text-gray-400 dark:text-gray-500 mb-3"></i>
-          <p className="text-gray-500 dark:text-gray-400">{emptyMessage}</p>
+          <p className="text-gray-500 dark:text-gray-400">{t(emptyMessage)}</p>
         </div>
       </div>
     );
@@ -181,7 +183,7 @@ const TransactionList: React.FC<TransactionListProps> = ({
                       ) : (
                         <i className="fas fa-check"></i>
                       )}
-                      승인
+                      {t('approve')}
                     </button>
                     <button
                       onClick={() => handleStatusUpdate(transaction.id, "REJECTED")}
@@ -193,7 +195,7 @@ const TransactionList: React.FC<TransactionListProps> = ({
                       ) : (
                         <i className="fas fa-times"></i>
                       )}
-                      거절
+                      {t('reject')}
                     </button>
                   </div>
                 </div>

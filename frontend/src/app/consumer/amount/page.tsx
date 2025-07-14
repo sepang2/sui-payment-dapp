@@ -6,8 +6,10 @@ import AmountInput from "@/components/AmountInput";
 import { useBalance } from "@/hooks/useBalance";
 import { getPaymentFlowData, savePaymentFlowData } from "@/utils/paymentFlow";
 import { useConsumerAuth } from "@/hooks/useAuth";
+import { useTranslation } from "react-i18next";
 
 const AmountPage: React.FC = () => {
+  const { t } = useTranslation();
   const router = useRouter();
   const { isAuthenticated } = useConsumerAuth();
   const { balance, isPending: balanceLoading } = useBalance();
@@ -77,7 +79,7 @@ const AmountPage: React.FC = () => {
       <div className="flex items-center justify-center h-screen bg-gray-50 dark:bg-gray-900">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">로딩 중...</p>
+          <p className="text-gray-600 dark:text-gray-400">{t('loading')}</p>
         </div>
       </div>
     );

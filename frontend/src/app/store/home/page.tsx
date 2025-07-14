@@ -4,7 +4,6 @@ import React from "react";
 import { useStoreAuth } from "../../../hooks/useAuth";
 import Header from "../../../components/Header";
 import StoreBottomNavigation from "../../../components/StoreBottomNavigation";
-
 import StoreDashboard from "../../../components/StoreDashboard";
 import QRCodeDisplay from "../../../components/QRCodeDisplay";
 

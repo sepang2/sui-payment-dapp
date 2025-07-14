@@ -3,6 +3,7 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
+import { useTranslation } from "react-i18next";
 
 interface StoreBottomNavigationProps {
   visible: boolean;
@@ -11,25 +12,26 @@ interface StoreBottomNavigationProps {
 export default function StoreBottomNavigation({ visible }: StoreBottomNavigationProps) {
   const router = useRouter();
   const pathname = usePathname();
+  const { t } = useTranslation();
 
   if (!visible) return null;
 
   const menuItems = [
     {
       id: "home",
-      label: "홈",
+      label: t("home"),
       icon: "fas fa-home",
       path: "/store/home",
     },
     {
       id: "transactions",
-      label: "거래",
+      label: t("transactions"),
       icon: "fas fa-exchange-alt",
       path: "/store/transactions",
     },
     {
       id: "profile",
-      label: "정보",
+      label: t("profile"),
       icon: "fas fa-user",
       path: "/store/profile",
     },

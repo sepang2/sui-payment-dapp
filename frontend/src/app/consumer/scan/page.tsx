@@ -5,8 +5,10 @@ import { useRouter } from "next/navigation";
 import QRScanner from "@/components/QRScanner";
 import { savePaymentFlowData } from "@/utils/paymentFlow";
 import { useConsumerAuth } from "@/hooks/useAuth";
+import { useTranslation } from "react-i18next";
 
 const ScanPage: React.FC = () => {
+  const { t } = useTranslation();
   const router = useRouter();
   const { isAuthenticated } = useConsumerAuth();
 
@@ -51,7 +53,7 @@ const ScanPage: React.FC = () => {
         handleCancel();
       }
     } catch (error) {
-      console.error("QR scan processing failed:", error);
+      console.error(t("qr_scan_failed"), error);
       handleCancel();
     }
   };

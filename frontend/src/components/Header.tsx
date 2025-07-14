@@ -5,6 +5,7 @@ import { ConnectButton } from "@mysten/dapp-kit";
 import { useDarkMode } from "../contexts/DarkModeContext";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTranslation } from "react-i18next";
 
 interface HeaderProps {
   walletConnected: boolean;
@@ -15,6 +16,7 @@ const Header: React.FC<HeaderProps> = ({ walletConnected, walletAddress }) => {
   const [showDisconnect, setShowDisconnect] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
   const { isDarkMode, toggleDarkMode } = useDarkMode();
+  const { i18n, t } = useTranslation();
 
   const pathname = usePathname();
   let homePath = "/";
@@ -95,6 +97,10 @@ const Header: React.FC<HeaderProps> = ({ walletConnected, walletAddress }) => {
     }
   };
 
+  const toggleLanguage = () => {
+    i18n.changeLanguage(i18n.language === "ko" ? "en" : "ko");
+  };
+
   return (
     <header className="bg-white dark:bg-gray-800 shadow-sm">
       <div className="flex justify-center">
@@ -105,6 +111,12 @@ const Header: React.FC<HeaderProps> = ({ walletConnected, walletAddress }) => {
             </Link>
           </div>
           <div className="flex items-center space-x-3">
+            <button
+              onClick={toggleLanguage}
+              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            >
+              {i18n.language === "ko" ? "EN" : "KO"}
+            </button>
             {/* 다크모드 토글 버튼 */}
             {/* <button
               onClick={toggleDarkMode}
@@ -138,7 +150,7 @@ const Header: React.FC<HeaderProps> = ({ walletConnected, walletAddress }) => {
                   <div className="absolute right-0 top-full mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg min-w-[200px] z-50">
                     <div className="p-2">
                       <div className="px-3 py-2 text-sm text-gray-700 dark:text-gray-300 border-b border-gray-100 dark:border-gray-600">
-                        <div className="font-medium mb-2">연결된 지갑</div>
+                        <div className="font-medium mb-2">{t('connected_wallet')}</div>
                         <div className="flex items-center">
                           <div className="text-xs text-gray-500 dark:text-gray-400 mr-2 pr-1">
                             {formatWalletAddress(walletAddress || "")}
@@ -150,7 +162,7 @@ const Header: React.FC<HeaderProps> = ({ walletConnected, walletAddress }) => {
                                 ? "text-green-600 dark:text-green-400"
                                 : "text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
                             }`}
-                            title={copySuccess ? "복사됨!" : "주소 복사"}
+                            title={copySuccess ? t('copy_success') : t('copy_address')}
                           >
                             <i className={`fas ${copySuccess ? "fa-check" : "fa-copy"} text-xs`}></i>
                           </button>
@@ -161,7 +173,7 @@ const Header: React.FC<HeaderProps> = ({ walletConnected, walletAddress }) => {
                         className="w-full text-left px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors flex items-center"
                       >
                         <i className="fas fa-sign-out-alt mr-2 pr-1"></i>
-                        지갑 연결 해제
+                        {t('disconnect_wallet')}
                       </button>
                     </div>
                   </div>

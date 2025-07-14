@@ -8,8 +8,10 @@ import Header from "../components/Header";
 import UserRegistration from "../components/UserRegistration";
 import WalletConnectionPrompt from "../components/common/WalletConnectionPrompt";
 import { UserType } from "../utils/constants";
+import { useTranslation } from "react-i18next";
 
 export default function Home() {
+  const { t } = useTranslation();
   const router = useRouter();
   const account = useCurrentAccount();
   const { user, isNewUser, isLoading: userLoading } = useUser();
@@ -101,7 +103,7 @@ export default function Home() {
           <div className="flex items-center justify-center h-64">
             <div className="text-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-              <p className="text-gray-600 dark:text-gray-400">지갑 연결을 확인하는 중...</p>
+              <p className="text-gray-600 dark:text-gray-400">{t('checking_wallet_connection')}</p>
             </div>
           </div>
         )}
@@ -111,7 +113,7 @@ export default function Home() {
           <div className="flex items-center justify-center h-64">
             <div className="text-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-              <p className="text-gray-600 dark:text-gray-400">사용자 정보를 확인하는 중...</p>
+              <p className="text-gray-600 dark:text-gray-400">{t('checking_user_info')}</p>
             </div>
           </div>
         )}

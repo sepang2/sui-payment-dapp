@@ -3,6 +3,7 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
+import { useTranslation } from "react-i18next";
 
 interface ConsumerBottomNavigationProps {
   visible: boolean;
@@ -11,25 +12,26 @@ interface ConsumerBottomNavigationProps {
 export default function ConsumerBottomNavigation({ visible }: ConsumerBottomNavigationProps) {
   const router = useRouter();
   const pathname = usePathname();
+  const { t } = useTranslation();
 
   if (!visible) return null;
 
   const menuItems = [
     {
       id: "home",
-      label: "홈",
+      label: t("home"),
       icon: "fas fa-home",
       path: "/consumer/home",
     },
     {
       id: "transactions",
-      label: "거래",
+      label: t("transactions"),
       icon: "fas fa-exchange-alt",
       path: "/consumer/transactions",
     },
     {
       id: "explore",
-      label: "탐색",
+      label: t("explore"),
       icon: "fas fa-search",
       path: "/consumer/explore",
     },

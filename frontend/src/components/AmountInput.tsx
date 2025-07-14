@@ -2,6 +2,7 @@
 
 import React from "react";
 import Keypad from "./Keypad";
+import { useTranslation } from "react-i18next";
 
 interface AmountInputProps {
   amount: string;
@@ -12,14 +13,8 @@ interface AmountInputProps {
   onProceed: () => void;
 }
 
-const AmountInput: React.FC<AmountInputProps> = ({
-  amount,
-  name,
-  balance,
-  onKeypadPress,
-  onCancel,
-  onProceed,
-}) => {
+const AmountInput: React.FC<AmountInputProps> = ({ amount, name, balance, onKeypadPress, onCancel, onProceed }) => {
+  const { t } = useTranslation();
   // 원본 amount 문자열을 그대로 사용하여 소수점 입력 과정을 정확히 표시
   const coinAmount = amount === "0" ? "0" : amount;
   const availableCoin = balance.toLocaleString();
@@ -35,16 +30,16 @@ const AmountInput: React.FC<AmountInputProps> = ({
 
         {/* 메시지 */}
         <div className="text-center mb-6">
-          <h1 className="text-lg font-medium text-gray-800 dark:text-white mb-1">{name}에서</h1>
-          <h2 className="text-lg font-medium text-gray-800 dark:text-white">얼마를 결제할까요?</h2>
+          <h1 className="text-lg font-medium text-gray-800 dark:text-white mb-1">{t('from_store', { name })}</h1>
+          <h2 className="text-lg font-medium text-gray-800 dark:text-white">{t('how_much_to_pay')}</h2>
         </div>
 
         {/* 금액 표시 */}
         <div className="text-center mb-6">
           <p className="text-4xl font-bold text-gray-900 dark:text-white mb-2">{coinAmount} SUI</p>
-          <p className="text-gray-500 dark:text-gray-400 text-sm">지갑 잔고 {availableCoin} SUI</p>
+          <p className="text-gray-500 dark:text-gray-400 text-sm">{t('wallet_balance', { balance: availableCoin })}</p>
           {parseFloat(amount) > balance && (
-            <p className="text-red-500 dark:text-red-400 text-sm mt-2">잔고가 부족합니다</p>
+            <p className="text-red-500 dark:text-red-400 text-sm mt-2">{t('insufficient_balance')}</p>
           )}
         </div>
       </div>
@@ -55,14 +50,14 @@ const AmountInput: React.FC<AmountInputProps> = ({
           onClick={onCancel}
           className="bg-gray-400 hover:bg-gray-500 dark:bg-gray-600 dark:hover:bg-gray-700 text-white py-3 rounded-lg font-semibold text-base transition-colors w-full"
         >
-          취소
+          {t('cancel')}
         </button>
         <button
           onClick={onProceed}
           disabled={parseFloat(amount) <= 0 || parseFloat(amount) > balance}
           className="bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-700 dark:hover:bg-indigo-800 disabled:bg-gray-300 dark:disabled:bg-gray-700 text-white py-3 rounded-lg font-semibold text-base transition-colors w-full"
         >
-          다음
+          {t("next")}
         </button>
       </div>
 

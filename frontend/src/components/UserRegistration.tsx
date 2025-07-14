@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import QRCode from "qrcode";
 import { UserType } from "../utils/constants";
+import { useTranslation } from "react-i18next";
 
 interface UserRegistrationProps {
   walletAddress: string;
@@ -11,6 +12,7 @@ interface UserRegistrationProps {
 }
 
 const UserRegistration: React.FC<UserRegistrationProps> = ({ walletAddress, onRegistrationComplete, onCancel }) => {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState<{
     name: string;
     description: string;
@@ -162,7 +164,7 @@ const UserRegistration: React.FC<UserRegistrationProps> = ({ walletAddress, onRe
       onRegistrationComplete(formData.userType);
     } catch (error) {
       console.error("Registration error:", error);
-      setErrors({ submit: "등록 중 오류가 발생했습니다. 다시 시도해주세요." });
+      setErrors({ submit: t("registration_error") });
     } finally {
       setIsSubmitting(false);
     }

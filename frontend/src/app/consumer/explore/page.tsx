@@ -6,6 +6,7 @@ import { useConsumerAuth } from "../../../hooks/useAuth";
 import Header from "../../../components/Header";
 import ConsumerBottomNavigation from "../../../components/ConsumerBottomNavigation";
 import { listVariants, itemVariants } from "../../../utils/animations";
+import { useTranslation } from "react-i18next";
 
 interface LumaLink {
   id: string;
@@ -27,6 +28,7 @@ interface EnhancedLumaLink extends LumaLink {
 }
 
 export default function ConsumerExplorePage() {
+  const { t } = useTranslation();
   const { isLoading: authLoading, user, isAuthenticated } = useConsumerAuth();
   const [lumaLinks, setLumaLinks] = useState<EnhancedLumaLink[]>([]);
   const [loading, setLoading] = useState(true);
@@ -111,11 +113,11 @@ export default function ConsumerExplorePage() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Header walletConnected={isAuthenticated} walletAddress={user?.walletAddress} />
       <div className="px-4 py-6 pb-24 max-w-md mx-auto">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">이벤트 탐색</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('explore_events')}</h1>
         {lumaLinks.length === 0 ? (
           <div className="text-center py-12">
             <i className="fas fa-search text-4xl text-gray-400 dark:text-gray-500 mb-4"></i>
-            <p className="text-gray-500 dark:text-gray-400">등록된 이벤트가 없습니다.</p>
+            <p className="text-gray-500 dark:text-gray-400">{t('no_registered_events')}</p>
           </div>
         ) : (
           <motion.div

@@ -5,8 +5,10 @@ import { useRouter } from "next/navigation";
 import PaymentSuccess from "@/components/PaymentSuccess";
 import { getPaymentFlowData, clearPaymentFlowData } from "@/utils/paymentFlow";
 import { useConsumerAuth } from "@/hooks/useAuth";
+import { useTranslation } from "react-i18next";
 
 const SuccessPage: React.FC = () => {
+  const { t } = useTranslation();
   const router = useRouter();
   const { isAuthenticated } = useConsumerAuth();
   const [amount, setAmount] = useState<string>("0");
@@ -143,7 +145,7 @@ const SuccessPage: React.FC = () => {
       <div className="flex items-center justify-center h-screen bg-gray-50 dark:bg-gray-900">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">로딩 중...</p>
+          <p className="text-gray-600 dark:text-gray-400">{t('loading')}</p>
         </div>
       </div>
     );
@@ -157,7 +159,7 @@ const SuccessPage: React.FC = () => {
         <div className="fixed bottom-4 right-4 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg">
           <div className="flex items-center space-x-2">
             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-            <span className="text-sm">거래 내역 저장 중...</span>
+            <span className="text-sm">{t('saving_transaction_history')}</span>
           </div>
         </div>
       )}

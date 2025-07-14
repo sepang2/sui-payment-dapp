@@ -6,6 +6,7 @@ import { useStoreAuth } from "../../../hooks/useAuth";
 import Header from "../../../components/Header";
 import StoreBottomNavigation from "../../../components/StoreBottomNavigation";
 import { itemVariants } from "../../../utils/animations";
+import { useTranslation } from "react-i18next";
 
 interface User {
   id: string;
@@ -20,6 +21,7 @@ interface User {
 }
 
 export default function StoreProfilePage() {
+  const { t } = useTranslation();
   const { isLoading: authLoading, user: authUser, isAuthenticated } = useStoreAuth();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -165,7 +167,7 @@ export default function StoreProfilePage() {
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
             <i className="fas fa-exclamation-triangle text-4xl text-red-500 mb-4"></i>
-            <p className="text-red-500 dark:text-red-400">사용자 정보를 불러오는데 실패했습니다.</p>
+            <p className="text-red-500 dark:text-red-400">{t('failed_to_load_user_info')}</p>
           </div>
         </div>
         <StoreBottomNavigation visible={true} />
@@ -178,13 +180,13 @@ export default function StoreProfilePage() {
       <Header walletConnected={isAuthenticated} walletAddress={authUser?.walletAddress} />
       <div className="px-4 py-6 pb-24 max-w-md mx-auto">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">상점 정보</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('store_info')}</h1>
           {!editing && user && (
             <button
               onClick={handleEdit}
               className="bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-700 dark:hover:bg-indigo-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
             >
-              정보 수정
+              {t('edit_info')}
             </button>
           )}
         </div>
@@ -205,7 +207,7 @@ export default function StoreProfilePage() {
             <div className="space-y-4">
               <div>
                 <label className="block text-xs font-semibold text-indigo-600 dark:text-indigo-400 mb-2 uppercase tracking-wide">
-                  상점명
+                  {t('store_name_label')}
                 </label>
                 {editing ? (
                   <input
@@ -213,7 +215,7 @@ export default function StoreProfilePage() {
                     value={editForm.name}
                     onChange={(e) => handleInputChange("name", e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 text-black dark:text-white"
-                    placeholder="상점명을 입력하세요"
+                    placeholder={t('enter_store_name_profile')}
                   />
                 ) : (
                   <div className="px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600">
@@ -224,21 +226,21 @@ export default function StoreProfilePage() {
 
               <div>
                 <label className="block text-xs font-semibold text-indigo-600 dark:text-indigo-400 mb-2 uppercase tracking-wide">
-                  상점 설명
+                  {t('store_description_label')}
                 </label>
                 {editing ? (
                   <textarea
                     value={editForm.description}
                     onChange={(e) => handleInputChange("description", e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 text-black dark:text-white"
-                    placeholder="상점 소개를 입력하세요"
+                    placeholder={t('enter_store_description_profile')}
                     rows={3}
                   />
                 ) : (
                   <div className="px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600">
                     <p className="text-gray-900 dark:text-white">
                       {user.description || (
-                        <span className="text-gray-500 dark:text-gray-400 italic">상점 설명이 없습니다.</span>
+                        <span className="text-gray-500 dark:text-gray-400 italic">{t('no_store_description')}</span>
                       )}
                     </p>
                   </div>
@@ -247,7 +249,7 @@ export default function StoreProfilePage() {
 
               <div>
                 <label className="block text-xs font-semibold text-indigo-600 dark:text-indigo-400 mb-2 uppercase tracking-wide">
-                  이벤트
+                  {t('event_label')}
                 </label>
                 {editing ? (
                   <input
@@ -255,7 +257,7 @@ export default function StoreProfilePage() {
                     value={editForm.lumaLink}
                     onChange={(e) => handleInputChange("lumaLink", e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 text-black dark:text-white"
-                    placeholder="https://lu.ma/..."
+                    placeholder={t('luma_event_url')}
                   />
                 ) : (
                   <div className="px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600">
@@ -269,7 +271,7 @@ export default function StoreProfilePage() {
                         {user.lumaLink}
                       </a>
                     ) : (
-                      <p className="text-gray-500 dark:text-gray-400 italic">Luma URL이 없습니다.</p>
+                      <p className="text-gray-500 dark:text-gray-400 italic">{t('no_luma_url')}</p>
                     )}
                   </div>
                 )}
@@ -277,7 +279,7 @@ export default function StoreProfilePage() {
 
               <div>
                 <label className="block text-xs font-semibold text-indigo-600 dark:text-indigo-400 mb-2 uppercase tracking-wide">
-                  지갑 주소
+                  {t('wallet_address_label')}
                 </label>
                 <div className="flex items-center px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600">
                   <p className="text-gray-900 dark:text-white text-sm font-mono break-all flex-1 mr-2">
@@ -290,7 +292,7 @@ export default function StoreProfilePage() {
                         ? "text-green-600 dark:text-green-400"
                         : "text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
                     }`}
-                    title={copySuccess ? "복사됨!" : "주소 복사"}
+                    title={copySuccess ? t('copy_success') : t('copy_address')}
                   >
                     <i className={`fas ${copySuccess ? "fa-check" : "fa-copy"} text-sm`}></i>
                   </button>
@@ -305,14 +307,14 @@ export default function StoreProfilePage() {
                   disabled={saving}
                   className="flex-1 bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-700 dark:hover:bg-indigo-800 text-white py-2 px-4 rounded-lg font-medium transition-colors disabled:opacity-50"
                 >
-                  {saving ? "저장 중..." : "저장"}
+                  {saving ? t('saving') : t('save')}
                 </button>
                 <button
                   onClick={handleCancel}
                   disabled={saving}
                   className="flex-1 bg-gray-300 hover:bg-gray-400 dark:bg-gray-600 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 py-2 px-4 rounded-lg font-medium transition-colors disabled:opacity-50"
                 >
-                  취소
+                  {t('cancel')}
                 </button>
               </div>
             )}

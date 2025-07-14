@@ -8,10 +8,12 @@ import { useInfiniteScroll } from "../../../hooks/useInfiniteScroll";
 import Header from "../../../components/Header";
 import ConsumerBottomNavigation from "../../../components/ConsumerBottomNavigation";
 import { EXCHANGE_RATE } from "../../../utils/constants";
+import { useTranslation } from "react-i18next";
 
 type StatusFilter = "ALL" | "PENDING" | "APPROVED" | "REJECTED";
 
 export default function ConsumerTransactionsPage() {
+  const { t } = useTranslation();
   const { isLoading: authLoading, user, isAuthenticated } = useConsumerAuth();
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("ALL");
   const [previousCount, setPreviousCount] = useState(0);
@@ -174,7 +176,7 @@ export default function ConsumerTransactionsPage() {
       <Header walletConnected={isAuthenticated} walletAddress={user?.walletAddress} />
       <div className="px-4 py-6 pb-24 max-w-md mx-auto">
         <div className="flex items-center justify-between mb-4">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">거래 내역</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('transaction_history')}</h1>
         </div>
         {/* 지출 현황 카드 */}
         {/* <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">지출 현황</h1>
@@ -199,26 +201,26 @@ export default function ConsumerTransactionsPage() {
 
         {/* 거래 상태 통계 */}
         <div className="w-full bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 mb-6">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">거래 현황</h3>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('transaction_status')}</h3>
           <div className="grid grid-cols-3 gap-3 text-center">
             <div>
               <div className="flex items-center justify-center mb-1">
                 <i className="fas fa-clock text-yellow-500 mr-1"></i>
-                <span className="text-sm text-gray-600 dark:text-gray-400">보류</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">{t('pending')}</span>
               </div>
               <p className="text-xl font-bold text-yellow-600 dark:text-yellow-400">{statusCounts.PENDING}</p>
             </div>
             <div>
               <div className="flex items-center justify-center mb-1">
                 <i className="fas fa-check text-green-500 mr-1"></i>
-                <span className="text-sm text-gray-600 dark:text-gray-400">승인</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">{t('approved')}</span>
               </div>
               <p className="text-xl font-bold text-green-600 dark:text-green-400">{statusCounts.APPROVED}</p>
             </div>
             <div>
               <div className="flex items-center justify-center mb-1">
                 <i className="fas fa-times text-red-500 mr-1"></i>
-                <span className="text-sm text-gray-600 dark:text-gray-400">거절</span>
+                <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">{t('rejected')}</span>
               </div>
               <p className="text-xl font-bold text-red-600 dark:text-red-400">{statusCounts.REJECTED}</p>
             </div>
@@ -229,19 +231,19 @@ export default function ConsumerTransactionsPage() {
         <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
           <button onClick={() => setStatusFilter("ALL")} className={getFilterButtonClass("ALL")}>
             <i className={getStatusIcon("ALL")}></i>
-            <span className="ml-2">전체 ({transactions.length})</span>
+            <span className="ml-2">{t('all')} ({transactions.length})</span>
           </button>
           <button onClick={() => setStatusFilter("PENDING")} className={getFilterButtonClass("PENDING")}>
             <i className={getStatusIcon("PENDING")}></i>
-            <span className="ml-2">보류 ({statusCounts.PENDING})</span>
+            <span className="ml-2">{t('pending')} ({statusCounts.PENDING})</span>
           </button>
           <button onClick={() => setStatusFilter("APPROVED")} className={getFilterButtonClass("APPROVED")}>
             <i className={getStatusIcon("APPROVED")}></i>
-            <span className="ml-2">승인 ({statusCounts.APPROVED})</span>
+            <span className="ml-2">{t('approved')} ({statusCounts.APPROVED})</span>
           </button>
           <button onClick={() => setStatusFilter("REJECTED")} className={getFilterButtonClass("REJECTED")}>
             <i className={getStatusIcon("REJECTED")}></i>
-            <span className="ml-2">거절 ({statusCounts.REJECTED})</span>
+            <span className="ml-2">{t('rejected')} ({statusCounts.REJECTED})</span>
           </button>
         </div>
 
@@ -251,10 +253,10 @@ export default function ConsumerTransactionsPage() {
             <i className="fas fa-exchange-alt text-4xl text-gray-400 dark:text-gray-500 mb-4"></i>
             <p className="text-gray-500 dark:text-gray-400">
               {statusFilter === "ALL"
-                ? "거래 내역이 없습니다."
+                ? t('no_transaction_history')
                 : `${
-                    statusFilter === "PENDING" ? "보류" : statusFilter === "APPROVED" ? "승인" : "거절"
-                  }된 거래가 없습니다.`}
+                    statusFilter === "PENDING" ? t('pending') : statusFilter === "APPROVED" ? t('approved') : t('rejected')
+                  } ${t('no_transaction_history')}`}
             </p>
           </div>
         ) : (
@@ -296,7 +298,7 @@ export default function ConsumerTransactionsPage() {
                               className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 hover:underline"
                               onClick={(e) => e.stopPropagation()}
                             >
-                              트랜잭션 해시: {formatAddress(transaction.txHash)}
+                              {t('transaction_hash')}: {formatAddress(transaction.txHash)}
                             </a>
                           </p>
                         </div>
@@ -326,7 +328,7 @@ export default function ConsumerTransactionsPage() {
             {/* 더 이상 불러올 데이터가 없을 때 */}
             {!hasMore && transactions.length > 0 && (
               <div className="text-center py-4 mt-4">
-                <p className="text-gray-500 dark:text-gray-400 text-sm">모든 거래 내역을 불러왔습니다.</p>
+                <p className="text-gray-500 dark:text-gray-400 text-sm">{t('all_transactions_loaded')}</p>
               </div>
             )}
           </div>

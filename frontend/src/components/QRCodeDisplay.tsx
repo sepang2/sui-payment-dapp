@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 interface QRCodeDisplayProps {
   user: {
@@ -15,6 +16,7 @@ interface QRCodeDisplayProps {
 
 const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({ user, onClose }) => {
   const [copied, setCopied] = useState(false);
+  const { t } = useTranslation();
 
   const copyToClipboard = async () => {
     try {
@@ -31,7 +33,7 @@ const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({ user, onClose }) => {
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md mx-4">
         {/* 헤더 */}
         <div className="flex justify-between items-center p-6 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="text-xl font-bold text-gray-800 dark:text-white">내 QR 코드</h2>
+          <h2 className="text-xl font-bold text-gray-800 dark:text-white">{t('my_qr_code')}</h2>
           <button
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-2xl"
@@ -72,7 +74,7 @@ const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({ user, onClose }) => {
 
               {/* 안내 메시지 */}
               <div className="bg-blue-50 dark:bg-blue-900 p-3 rounded-lg">
-                <p className="text-sm text-blue-700 dark:text-blue-300">이 QR 코드를 스캔하여 결제를 진행해주세요.</p>
+                <p className="text-sm text-blue-700 dark:text-blue-300">{t('scan_qr_to_pay')}</p>
               </div>
             </div>
           ) : (
@@ -80,12 +82,12 @@ const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({ user, onClose }) => {
               <div className="w-64 h-64 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center mx-auto">
                 <div className="text-center">
                   <i className="fas fa-qrcode text-4xl text-gray-400 dark:text-gray-500 mb-2"></i>
-                  <p className="text-gray-500 dark:text-gray-400">QR 코드가 없습니다</p>
+                  <p className="text-gray-500 dark:text-gray-400">{t('no_qr_code')}</p>
                 </div>
               </div>
               <div className="bg-yellow-50 dark:bg-yellow-900 p-3 rounded-lg">
                 <p className="text-sm text-yellow-700 dark:text-yellow-300">
-                  QR 코드를 생성하려면 프로필을 업데이트해주세요.
+                  {t('update_profile_for_qr')}
                 </p>
               </div>
             </div>
@@ -98,7 +100,7 @@ const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({ user, onClose }) => {
             onClick={onClose}
             className="w-full bg-gray-600 hover:bg-gray-700 text-white py-3 px-4 rounded-lg font-semibold"
           >
-            닫기
+            {t('close')}
           </button>
         </div>
       </div>
