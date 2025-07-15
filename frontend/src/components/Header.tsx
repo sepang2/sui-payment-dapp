@@ -18,6 +18,17 @@ const Header: React.FC<HeaderProps> = ({ walletConnected, walletAddress }) => {
   const { isDarkMode, toggleDarkMode } = useDarkMode();
   const { i18n, t } = useTranslation();
 
+  // 언어 초기화: localStorage에 저장된 언어가 있으면 적용
+  React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      const savedLang = localStorage.getItem("appLanguage");
+      if (savedLang && i18n.language !== savedLang) {
+        i18n.changeLanguage(savedLang);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const pathname = usePathname();
   let homePath = "/";
   if (pathname.startsWith("/consumer")) {
@@ -98,7 +109,11 @@ const Header: React.FC<HeaderProps> = ({ walletConnected, walletAddress }) => {
   };
 
   const toggleLanguage = () => {
-    i18n.changeLanguage(i18n.language === "ko" ? "en" : "ko");
+    const newLang = i18n.language === "ko" ? "en" : "ko";
+    i18n.changeLanguage(newLang);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("appLanguage", newLang);
+    }
   };
 
   return (
@@ -150,7 +165,7 @@ const Header: React.FC<HeaderProps> = ({ walletConnected, walletAddress }) => {
                   <div className="absolute right-0 top-full mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg min-w-[200px] z-50">
                     <div className="p-2">
                       <div className="px-3 py-2 text-sm text-gray-700 dark:text-gray-300 border-b border-gray-100 dark:border-gray-600">
-                        <div className="font-medium mb-2">{t('connected_wallet')}</div>
+                        <div className="font-medium mb-2">{t("connected_wallet")}</div>
                         <div className="flex items-center">
                           <div className="text-xs text-gray-500 dark:text-gray-400 mr-2 pr-1">
                             {formatWalletAddress(walletAddress || "")}
@@ -162,7 +177,7 @@ const Header: React.FC<HeaderProps> = ({ walletConnected, walletAddress }) => {
                                 ? "text-green-600 dark:text-green-400"
                                 : "text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
                             }`}
-                            title={copySuccess ? t('copy_success') : t('copy_address')}
+                            title={copySuccess ? t("copy_success") : t("copy_address")}
                           >
                             <i className={`fas ${copySuccess ? "fa-check" : "fa-copy"} text-xs`}></i>
                           </button>
@@ -173,7 +188,7 @@ const Header: React.FC<HeaderProps> = ({ walletConnected, walletAddress }) => {
                         className="w-full text-left px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors flex items-center"
                       >
                         <i className="fas fa-sign-out-alt mr-2 pr-1"></i>
-                        {t('disconnect_wallet')}
+                        {t("disconnect_wallet")}
                       </button>
                     </div>
                   </div>
