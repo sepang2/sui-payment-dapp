@@ -58,7 +58,7 @@ const PaymentConfirmation: React.FC<PaymentConfirmationProps> = ({
               <div className="flex flex-col items-end">
                 <p className="text-base font-bold text-gray-900 dark:text-white">{finalAmount.toFixed(3)} SUI</p>
                 <p className="text-gray-900 dark:text-white text-sm">
-                  ≈ {(finalAmount * EXCHANGE_RATE).toLocaleString()} {t("krw")}
+                  ≈ {(finalAmount * EXCHANGE_RATE).toLocaleString()} KRW
                 </p>
               </div>
             </div>

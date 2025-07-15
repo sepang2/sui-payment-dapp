@@ -52,7 +52,7 @@
   "insufficient_balance": "잔액이 부족합니다.",
   "from_store": "{{name}} 에서",
   "how_much_to_pay": "얼마를 결제할까요?",
-  "wallet_balance": "지갑 잔고",
+  "wallet_balance": "지갑 잔고: {{balance}} SUI",
   "next": "다음",
   "pay_to_store": "{{name}}에서",
   "confirm_payment": "결제할까요?",
