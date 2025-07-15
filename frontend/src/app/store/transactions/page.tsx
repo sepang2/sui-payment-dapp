@@ -20,7 +20,7 @@ export default function StoreTransactionsPage() {
   const [processingTxId, setProcessingTxId] = useState<string | null>(null);
   const exchangeRate = EXCHANGE_RATE;
 
-  const { transactions, isLoading, isLoadingMore, hasMore, error, loadMore, updateTransactionStatus } =
+  const { transactions, isLoading, isLoadingMore, hasMore, error, loadMore, updateTransactionStatus, refetch } =
     useInfiniteTransactions(
       user?.walletAddress || null,
       "store",
@@ -30,7 +30,7 @@ export default function StoreTransactionsPage() {
     );
 
   // 전체 거래내역도 별도로 불러온다 (상단 상태 관리 탭/매출 현황용)
-  const { allTransactions } = useTransactions(user?.walletAddress || null, "store");
+  const { allTransactions, refetch: refetchAll } = useTransactions(user?.walletAddress || null, "store");
 
   // 무한스크롤 설정
   useInfiniteScroll({
@@ -143,6 +143,29 @@ export default function StoreTransactionsPage() {
         return "fas fa-list text-gray-500";
     }
   };
+
+  // SSE 구독 - 트랜잭션 상태 업데이트(DB) 실시간 수신
+  useEffect(() => {
+    if (!user?.walletAddress) return;
+
+    const eventSource = new EventSource(
+      `/api/transactions/stream?walletAddress=${encodeURIComponent(user.walletAddress)}&userType=store`
+    );
+
+    eventSource.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data.type === "transaction_status_update" || data.id || data.transaction) {
+        refetch(); // 무한스크롤 목록 갱신
+        refetchAll(); // 전체 목록 갱신
+      }
+    };
+
+    eventSource.onerror = (error) => {
+      console.error("SSE connection error:", error);
+    };
+
+    return () => eventSource.close();
+  }, [user?.walletAddress, refetch, refetchAll]);
 
   if (authLoading || isLoading) {
     return (
