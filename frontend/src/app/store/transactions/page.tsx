@@ -13,7 +13,7 @@ import { useTranslation } from "react-i18next";
 type StatusFilter = "ALL" | "PENDING" | "APPROVED" | "REJECTED";
 
 export default function StoreTransactionsPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { isLoading: authLoading, user, isAuthenticated } = useStoreAuth();
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("ALL");
   const [previousCount, setPreviousCount] = useState(0);
@@ -203,22 +203,22 @@ export default function StoreTransactionsPage() {
           <div className="grid grid-cols-3 gap-3 text-center">
             <div>
               <div className="flex items-center justify-center mb-1">
-                <i className="fas fa-clock text-yellow-500 mr-1"></i>
-                <span className="text-sm text-gray-600 dark:text-gray-400">{t("pending")}</span>
+                <i className="fas fa-clock text-yellow-500"></i>
+                <span className="text-sm text-gray-600 dark:text-gray-400 ml-2">{t("pending")}</span>
               </div>
               <p className="text-xl font-bold text-yellow-600 dark:text-yellow-400">{statusCounts.PENDING}</p>
             </div>
             <div>
               <div className="flex items-center justify-center mb-1">
-                <i className="fas fa-check text-green-500 mr-1"></i>
-                <span className="text-sm text-gray-600 dark:text-gray-400">{t("approved")}</span>
+                <i className="fas fa-check text-green-500"></i>
+                <span className="text-sm text-gray-600 dark:text-gray-400 ml-2">{t("approved")}</span>
               </div>
               <p className="text-xl font-bold text-green-600 dark:text-green-400">{statusCounts.APPROVED}</p>
             </div>
             <div>
               <div className="flex items-center justify-center mb-1">
-                <i className="fas fa-times text-red-500 mr-1"></i>
-                <span className="text-sm text-gray-600 dark:text-gray-400">{t("rejected")}</span>
+                <i className="fas fa-times text-red-500"></i>
+                <span className="text-sm text-gray-600 dark:text-gray-400 ml-2">{t("rejected")}</span>
               </div>
               <p className="text-xl font-bold text-red-600 dark:text-red-400">{statusCounts.REJECTED}</p>
             </div>
@@ -239,21 +239,39 @@ export default function StoreTransactionsPage() {
           </button>
           <button onClick={() => setStatusFilter("PENDING")} className={getFilterButtonClass("PENDING")}>
             <i className={getStatusIcon("PENDING")}></i>
-            <span className="ml-2">
-              {t("pending")} ({statusCounts.PENDING})
-            </span>
+            {i18n.language === "en" ? (
+              <span className="block">
+                {t("pending")} ({statusCounts.PENDING})
+              </span>
+            ) : (
+              <span className="ml-2">
+                {t("pending")} ({statusCounts.PENDING})
+              </span>
+            )}
           </button>
           <button onClick={() => setStatusFilter("APPROVED")} className={getFilterButtonClass("APPROVED")}>
             <i className={getStatusIcon("APPROVED")}></i>
-            <span className="ml-2">
-              {t("approved")} ({statusCounts.APPROVED})
-            </span>
+            {i18n.language === "en" ? (
+              <span className="block">
+                {t("approved")} ({statusCounts.APPROVED})
+              </span>
+            ) : (
+              <span className="ml-2">
+                {t("approved")} ({statusCounts.APPROVED})
+              </span>
+            )}
           </button>
           <button onClick={() => setStatusFilter("REJECTED")} className={getFilterButtonClass("REJECTED")}>
             <i className={getStatusIcon("REJECTED")}></i>
-            <span className="ml-2">
-              {t("rejected")} ({statusCounts.REJECTED})
-            </span>
+            {i18n.language === "en" ? (
+              <span className="block">
+                {t("rejected")} ({statusCounts.REJECTED})
+              </span>
+            ) : (
+              <span className="ml-2">
+                {t("rejected")} ({statusCounts.REJECTED})
+              </span>
+            )}
           </button>
         </div>
 
